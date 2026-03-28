@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CORSA Embed – Integration Test</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        background: #0a0a0a;
+        color: #eee;
+        padding: 40px 20px;
+        max-width: 960px;
+        margin: 0 auto;
+      }
+      h1 { color: #e53935; }
+      p { color: #aaa; font-size: 14px; }
+      code {
+        background: #1e1e1e;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 13px;
+      }
+
+      /* Optional: provide runtime config override instead of build-time env vars */
+      /*
+      <script>
+        window.__CORSA_EMBED_CONFIG__ = {
+          firebase: {
+            apiKey: "...",
+            authDomain: "...",
+            projectId: "...",
+            storageBucket: "...",
+            messagingSenderId: "...",
+            appId: "..."
+          },
+          domain: {
+            appsyncEndpoint: "https://...",
+            appsyncRealtimeEndpoint: "wss://...",
+            cdnBase: "https://..."
+          }
+        };
+      </script>
+      */
+    </style>
+  </head>
+  <body>
+    <h1>CORSA Embed Test Page</h1>
+    <p>
+      The embed below is loaded via a <code>&lt;script&gt;</code> tag with
+      <code>data-username</code> and <code>data-stream-id</code> attributes.
+    </p>
+    <p>Replace the values below with a real username and stream ID.</p>
+
+    <hr style="border-color:#333; margin: 24px 0;" />
+
+    <!--
+      EMBED SNIPPET — copy this into any host page.
+      Replace data-username and data-stream-id with real values before testing.
+      The bundle will auto-mount a container div immediately after this tag.
+    -->
+    <script
+      src="./dist-singlefile/bundle.js"
+      data-username="lukemccrae"
+      data-stream-id="REPLACE_WITH_REAL_STREAM_ID"
+    ></script>
+
+    <hr style="border-color:#333; margin: 24px 0;" />
+
+    <h2>Manual mount via JS API</h2>
+    <p>
+      You can also mount programmatically by targeting an existing element:
+    </p>
+    <pre style="background:#1e1e1e;padding:16px;border-radius:8px;overflow:auto;font-size:13px;"><code>&lt;div id="corsa-stream-widget"&gt;&lt;/div&gt;
+&lt;script src="bundle.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  CorsaEmbed.mount({
+    elementId: "corsa-stream-widget",
+    username: "luke",
+    streamId: "abc123"
+  });
+&lt;/script&gt;</code></pre>
+  </body>
+</html>
