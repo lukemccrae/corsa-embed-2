@@ -1,3 +1,4 @@
+// @ts-nocheck - Generated file; TypeScript checking disabled to allow enums under erasableSyntaxOnly.
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };

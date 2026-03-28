@@ -11,6 +11,7 @@ export default function App({ username, streamId }: AppProps) {
   return (
     <UserProvider>
       <StreamPage username={username} streamId={streamId} />
+      <div>hello</div>
     </UserProvider>
   );
 }

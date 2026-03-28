@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import type { Coordinate } from "../types";
+import type { Waypoint } from "../generated/schema";
 
 // Leaflet must be imported dynamically-safe for IIFE bundling
 import L from "leaflet";
@@ -18,12 +18,12 @@ L.Icon.Default.mergeOptions({
 });
 
 interface StreamMapProps {
-  coordinates: Coordinate[];
+  waypoints: Waypoint[];
   /** The most recent tracked position (for live tracking marker) */
-  trackerPosition?: Coordinate;
+  trackerPosition?: Waypoint;
 }
 
-export function StreamMap({ coordinates, trackerPosition }: StreamMapProps) {
+export function StreamMap({ waypoints, trackerPosition }: StreamMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const polylineRef = useRef<L.Polyline | null>(null);
@@ -53,12 +53,9 @@ export function StreamMap({ coordinates, trackerPosition }: StreamMapProps) {
   // Draw/update route polyline
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || coordinates.length === 0) return;
+    if (!map || waypoints.length === 0) return;
 
-    const latlngs: L.LatLngExpression[] = coordinates.map((c) => [
-      c.lat,
-      c.lng,
-    ]);
+    const latlngs: L.LatLngExpression[] = waypoints.map((w) => [w.lat, w.lng]);
 
     if (polylineRef.current) {
       polylineRef.current.setLatLngs(latlngs);
@@ -74,7 +71,7 @@ export function StreamMap({ coordinates, trackerPosition }: StreamMapProps) {
     if (latlngs.length > 0) {
       map.fitBounds(polylineRef.current.getBounds(), { padding: [20, 20] });
     }
-  }, [coordinates]);
+  }, [waypoints]);
 
   // Update tracker marker (live position)
   useEffect(() => {

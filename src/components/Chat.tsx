@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import type { ChatMessage } from "../types";
+import type { ChatMessage } from "../generated/schema";
 import { appsyncSubscribe } from "../helpers/appsync-subscription.helper";
-import { ON_NEW_CHAT_MESSAGE } from "../helpers/queries";
+import { ON_NEW_CHAT } from "../helpers/queries";
 import { resolveImageUrl, initialsAvatar } from "../utils/userImages";
 import { relativeTime } from "../utils/time";
 
@@ -22,13 +22,13 @@ export function Chat({ streamId, initialMessages, apiToken }: ChatProps) {
 
   // Subscribe to new messages
   useEffect(() => {
-    const unsub = appsyncSubscribe<{ onNewChatMessage: ChatMessage }>(
-      ON_NEW_CHAT_MESSAGE,
+    const unsub = appsyncSubscribe<{ onNewChat: ChatMessage }>(
+      ON_NEW_CHAT,
       { streamId },
       apiToken,
       (data) => {
-        if (data.onNewChatMessage) {
-          setMessages((prev) => [...prev, data.onNewChatMessage]);
+        if (data.onNewChat) {
+          setMessages((prev) => [...prev, data.onNewChat]);
         }
       }
     );
@@ -42,27 +42,32 @@ export function Chat({ streamId, initialMessages, apiToken }: ChatProps) {
         {messages.length === 0 && (
           <p className="ce-chat-empty">No messages yet. Be the first!</p>
         )}
-        {messages.map((msg) => {
-          const avatarUrl = resolveImageUrl(msg.authorAvatarKey);
+        {messages.map((msg, i) => {
+          const avatarUrl = resolveImageUrl(msg.publicUser.profilePicture);
           return (
-            <div key={msg.id} className="ce-chat-message">
+            <div
+              key={`${msg.createdAt}-${msg.userId}-${i}`}
+              className="ce-chat-message"
+            >
               <div className="ce-chat-avatar">
                 {avatarUrl ? (
                   <img
                     src={avatarUrl}
-                    alt={msg.authorDisplayName}
+                    alt={msg.publicUser.username}
                     className="ce-chat-avatar-img"
                   />
                 ) : (
                   <div className="ce-chat-avatar-placeholder">
-                    {initialsAvatar(msg.authorDisplayName)}
+                    {initialsAvatar(msg.publicUser.username)}
                   </div>
                 )}
               </div>
               <div className="ce-chat-content">
-                <span className="ce-chat-author">{msg.authorDisplayName}</span>
+                <span className="ce-chat-author">
+                  {msg.publicUser.username}
+                </span>
                 <span className="ce-chat-time">{relativeTime(msg.createdAt)}</span>
-                <p className="ce-chat-text">{msg.message}</p>
+                <p className="ce-chat-text">{msg.text}</p>
               </div>
             </div>
           );

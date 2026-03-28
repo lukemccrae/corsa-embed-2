@@ -1,17 +1,74 @@
-# React + TypeScript + Vite
+# Corsa Embed 2
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React + TypeScript + Vite embed library that renders a live activity stream (map, chat, posts, profile) for the Corsa platform.
 
-Currently, two official plugins are available:
+## GraphQL Query Pattern
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+This embed uses the same `getUserByUserName` + `liveStreams(streamId: ...)` query pattern as [corsa-next](https://github.com/lukemccrae/corsa-next), fetching all required data in a single round-trip:
 
-## React Compiler
+```typescript
+const STREAM_PROFILE_QUERY = (username: string, streamId: string) => `
+  query MyQuery {
+    getUserByUserName(username: "${username}") {
+      username
+      profilePicture
+      coverImagePath
+      streamId
+      bio
+      live
+      liveStreams(streamId: "${streamId}") {
+        streamId
+        mileMarker
+        title
+        startTime
+        finishTime
+        live
+        currentLocation { lat lng }
+        chatMessages { text createdAt publicUser { username profilePicture } }
+        waypoints { lat lng altitude mileMarker timestamp }
+        posts {
+          ... on StatusPost { text imagePath createdAt userId }
+        }
+      }
+    }
+  }
+`;
+```
+
+Real-time updates use the `onNewChat` and `onNewWaypoint` AppSync subscriptions.
+
+All TypeScript types are sourced from `src/generated/schema.ts` (generated via GraphQL Code Generator).
+
+## Embedding
+
+```html
+<script>
+  window.__CORSA_EMBED_CONFIG__ = {
+    firebase: { apiKey: "...", authDomain: "...", ... },
+    domain: { appsyncEndpoint: "...", appsyncRealtimeEndpoint: "...", cdnBase: "..." }
+  };
+</script>
+<script src="bundle.js"></script>
+<script>CorsaEmbed.mount(document.getElementById("embed"), { username: "alice", streamId: "stream-123" });</script>
+```
+
+## Development
+
+```bash
+npm run dev      # start dev server
+npm run build    # compile TypeScript + bundle to dist-singlefile/bundle.js
+npm run lint     # ESLint
+npm run codegen  # regenerate src/generated/schema.ts from AppSync schema
+```
+
+---
+
+*This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.*
+
+### React Compiler
 
 The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 

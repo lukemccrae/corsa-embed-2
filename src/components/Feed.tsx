@@ -1,55 +1,40 @@
-import type { Post } from "../types";
-import { resolveImageUrl, initialsAvatar } from "../utils/userImages";
+import type { Post, StatusPost } from "../generated/schema";
+import { resolveImageUrl } from "../utils/userImages";
 import { formatTimestamp } from "../utils/time";
 
 interface FeedProps {
   posts: Post[];
 }
 
+function isStatusPost(post: Post): post is StatusPost {
+  return (post as StatusPost).__typename === "StatusPost";
+}
+
 export function Feed({ posts }: FeedProps) {
-  if (posts.length === 0) {
+  const statusPosts = posts.filter(isStatusPost);
+
+  if (statusPosts.length === 0) {
     return null;
   }
 
   return (
     <div className="ce-feed">
       <h3 className="ce-section-title">Posts</h3>
-      {posts.map((post) => {
-        const avatarUrl = resolveImageUrl(post.authorAvatarKey);
-        const imageUrl = resolveImageUrl(post.imageKey);
+      {statusPosts.map((post, i) => {
+        const imageUrl = post.imagePath ? resolveImageUrl(post.imagePath) : null;
         return (
-          <div key={post.id} className="ce-post">
+          <div
+            key={`${post.createdAt}-${post.userId}-${i}`}
+            className="ce-post"
+          >
             <div className="ce-post-header">
-              <div className="ce-chat-avatar">
-                {avatarUrl ? (
-                  <img
-                    src={avatarUrl}
-                    alt={post.authorDisplayName}
-                    className="ce-chat-avatar-img"
-                  />
-                ) : (
-                  <div className="ce-chat-avatar-placeholder">
-                    {initialsAvatar(post.authorDisplayName)}
-                  </div>
-                )}
-              </div>
-              <div>
-                <span className="ce-chat-author">{post.authorDisplayName}</span>
-                <span className="ce-chat-time">
-                  {formatTimestamp(post.createdAt)}
-                </span>
-              </div>
+              <span className="ce-chat-time">
+                {formatTimestamp(post.createdAt)}
+              </span>
             </div>
-            <p className="ce-post-content">{post.content}</p>
+            {post.text && <p className="ce-post-content">{post.text}</p>}
             {imageUrl && (
-              <img
-                src={imageUrl}
-                alt="Post"
-                className="ce-post-image"
-              />
-            )}
-            {post.likeCount !== undefined && (
-              <div className="ce-post-likes">❤️ {post.likeCount}</div>
+              <img src={imageUrl} alt="Post" className="ce-post-image" />
             )}
           </div>
         );

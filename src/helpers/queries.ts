@@ -1,115 +1,118 @@
-// GraphQL query/mutation/subscription strings for the stream page
+// GraphQL query strings for the stream page, following the corsa-next pattern.
+// A single query fetches user profile + a specific live stream in one round-trip.
 
-export const GET_PROFILE_BY_USERNAME = /* GraphQL */ `
-  query GetProfileByUsername($username: String!) {
-    getProfileByUsername(username: $username) {
-      id
+/**
+ * Fetches the user profile and the specified live stream (including waypoints,
+ * chat messages, and posts) using the getUserByUserName + liveStreams(streamId)
+ * pattern from corsa-next.
+ *
+ * NOTE: `username` and `streamId` are interpolated directly into the query
+ * string to match the corsa-next resolver — both values come from trusted
+ * component props, not end-user input, so injection risk is minimal.
+ */
+export const STREAM_PROFILE_QUERY = (
+  username: string,
+  streamId: string
+) => /* GraphQL */ `
+  query MyQuery {
+    getUserByUserName(username: "${username}") {
       username
-      displayName
+      profilePicture
+      coverImagePath
+      streamId
       bio
-      avatarKey
-      totalDistance
-      totalActivities
-      followerCount
-      followingCount
-    }
-  }
-`;
-
-export const GET_STREAM = /* GraphQL */ `
-  query GetStream($streamId: ID!) {
-    getStream(id: $streamId) {
-      id
-      title
-      description
-      status
-      startTime
-      endTime
-      distance
-      duration
-      elevationGain
-      userId
-      username
-      coverImageKey
-      coordinates {
-        lat
-        lng
-        elevation
-        timestamp
-        heartRate
-        pace
-        cadence
-      }
-      posts {
-        items {
-          id
-          content
-          imageKey
+      live
+      liveStreams(streamId: "${streamId}") {
+        streamId
+        mileMarker
+        title
+        timezone
+        startTime
+        finishTime
+        live
+        currentLocation {
+          lat
+          lng
+        }
+        chatMessages {
+          text
           createdAt
-          authorUsername
-          authorDisplayName
-          authorAvatarKey
-          likeCount
+          streamId
+          userId
+          publicUser {
+            username
+            profilePicture
+          }
+        }
+        device {
+          make
+        }
+        route {
+          routeId
+          name
+          storagePath
+          overlayPath
+        }
+        waypoints {
+          lat
+          lng
+          altitude
+          mileMarker
+          timestamp
+          streamId
+          private
+        }
+        posts {
+          createdAt
+          type
+          userId
+          location {
+            lat
+            lng
+          }
+          ... on StatusPost {
+            text
+            imagePath
+            createdAt
+            userId
+            location {
+              lat
+              lng
+            }
+          }
         }
       }
     }
   }
 `;
 
-export const GET_STREAM_CHAT = /* GraphQL */ `
-  query GetStreamChat($streamId: ID!, $nextToken: String) {
-    getStreamChat(streamId: $streamId, nextToken: $nextToken) {
-      items {
-        id
-        streamId
-        authorUsername
-        authorDisplayName
-        authorAvatarKey
-        message
-        createdAt
-      }
-      nextToken
-    }
-  }
-`;
-
-export const ON_NEW_CHAT_MESSAGE = /* GraphQL */ `
-  subscription OnNewChatMessage($streamId: ID!) {
-    onNewChatMessage(streamId: $streamId) {
-      id
-      streamId
-      authorUsername
-      authorDisplayName
-      authorAvatarKey
-      message
+/** Real-time subscription for new chat messages on a live stream. */
+export const ON_NEW_CHAT = /* GraphQL */ `
+  subscription OnNewChat($streamId: ID!) {
+    onNewChat(streamId: $streamId) {
+      text
       createdAt
+      streamId
+      userId
+      publicUser {
+        username
+        profilePicture
+      }
     }
   }
 `;
 
-export const ON_STREAM_COORDINATE_ADDED = /* GraphQL */ `
-  subscription OnStreamCoordinateAdded($streamId: ID!) {
-    onStreamCoordinateAdded(streamId: $streamId) {
-      streamId
+/** Real-time subscription for new GPS waypoints on a live stream. */
+export const ON_NEW_WAYPOINT = /* GraphQL */ `
+  subscription OnNewWaypoint($streamId: ID!) {
+    onNewWaypoint(streamId: $streamId) {
       lat
       lng
-      elevation
+      altitude
+      mileMarker
       timestamp
-      heartRate
-      pace
-      cadence
-    }
-  }
-`;
-
-export const ON_STREAM_UPDATED = /* GraphQL */ `
-  subscription OnStreamUpdated($streamId: ID!) {
-    onStreamUpdated(id: $streamId) {
-      id
-      status
-      distance
-      duration
-      elevationGain
+      streamId
+      private
     }
   }
 `;
