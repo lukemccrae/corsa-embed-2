@@ -2,7 +2,7 @@ import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import fs from "fs";
 
 // Configuration
-const bucketName = "corsa-bucket";
+const bucketName = "corsa-general-bucket";
 const fileKey = "corsa-bundle.js"; // S3 object key
 const localFilePath = "./dist-singlefile/bundle.js"; // Local file to upload
 
