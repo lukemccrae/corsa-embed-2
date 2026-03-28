@@ -1,0 +1,13 @@
+schema:
+  - https://tuy3ixkamjcjpc5fzo2oqnnyym.appsync-api.us-west-1.amazonaws.com/graphql:
+      headers:
+        x-api-key: ${APPSYNC_API_KEY}
+
+generates:
+  src/generated/schema.ts:
+    plugins:
+      - typescript
+
+  graphql.schema.json:
+    plugins:
+      - introspection
