@@ -33,6 +33,7 @@ function mount() {
 
   const username = scriptEl.dataset.username;
   const streamId = scriptEl.dataset.streamId;
+  const mountSelector = scriptEl.dataset.mount;
 
   if (!username || !streamId) {
     console.error(
@@ -41,11 +42,23 @@ function mount() {
     return;
   }
 
-  // Create a container div and insert it right after the script tag
-  const container = document.createElement("div");
-  container.id = `corsa-embed-${streamId}`;
-  container.className = "corsa-embed-container";
-  scriptEl.parentNode?.insertBefore(container, scriptEl.nextSibling);
+  // If data-mount is provided, mount into that existing element; otherwise
+  // create a new container div immediately after the script tag.
+  let container: HTMLElement | null = null;
+  if (mountSelector) {
+    container = document.querySelector<HTMLElement>(mountSelector);
+    if (!container) {
+      console.error(
+        `[CorsaEmbed] data-mount target "${mountSelector}" not found in the document.`
+      );
+      return;
+    }
+  } else {
+    container = document.createElement("div");
+    container.id = `corsa-embed-${streamId}`;
+    container.className = "corsa-embed-container";
+    scriptEl.parentNode?.insertBefore(container, scriptEl.nextSibling);
+  }
 
   createRoot(container).render(
     <React.StrictMode>

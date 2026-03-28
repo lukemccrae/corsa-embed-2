@@ -1,24 +1,11 @@
 import {
-  createContext,
-  useContext,
   useEffect,
   useState,
   type ReactNode,
 } from "react";
 import { getAuth, signInAnonymously, onIdTokenChanged } from "firebase/auth";
 import { getFirebaseApp } from "../firebase";
-
-interface UserContextValue {
-  apiToken: string | null;
-  isReady: boolean;
-  error: string | null;
-}
-
-const UserContext = createContext<UserContextValue>({
-  apiToken: null,
-  isReady: false,
-  error: null,
-});
+import { UserContext } from "./UserContextDef";
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const [apiToken, setApiToken] = useState<string | null>(null);
@@ -60,8 +47,4 @@ export function UserProvider({ children }: { children: ReactNode }) {
       {children}
     </UserContext.Provider>
   );
-}
-
-export function useUser() {
-  return useContext(UserContext);
 }

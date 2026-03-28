@@ -9,7 +9,7 @@ import {
   ON_STREAM_COORDINATE_ADDED,
   ON_STREAM_UPDATED,
 } from "../helpers/queries";
-import { useUser } from "../context/UserContext";
+import { useUser } from "../context/useUser";
 import { ProfileCard } from "./ProfileCard";
 import { StreamMap } from "./StreamMap";
 import { ActivityChart } from "./ActivityChart";
