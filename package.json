@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "codegen": "npx graphql-codegen"
+    "codegen": "npx graphql-codegen",
+    "full-refresh": "yarn build && node upload.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1019.0",
