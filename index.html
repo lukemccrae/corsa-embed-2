@@ -3,23 +3,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>CORSA Embed – findingmydirt</title>
+    <title>CORSA Embed – Dev</title>
   </head>
 
   <body>
-    <!-- The embed bundle will auto-mount into this div (or one it creates).
-         Keeping a dedicated container makes it predictable. -->
-    <div id="corsa-embed"></div>
-
-    <!-- Load the single-file embed bundle -->
-    <script
-      src="https://d2ugbf2pkr6nwe.cloudfront.net/corsa-bundle.js"
-      data-username="findingmydirt"
-      data-stream-id="be5e8869-6481-4748-b985-b9004d95bd99"
-      data-mount="#corsa-embed"
-      defer
-    ></script>
-
+    <!-- Runtime config must be set before the app module loads -->
     <script>
       window.__CORSA_EMBED_CONFIG__ = {
         firebase: {
@@ -31,6 +19,22 @@
           appsyncEndpoint: "https://tuy3ixkamjcjpc5fzo2oqnnyym.appsync-api.us-west-1.amazonaws.com/graphql",
         },
       };
+    </script>
+
+    <div id="corsa-embed"></div>
+
+    <!--
+      In dev, document.currentScript is null for ES modules so the auto-mount
+      in main.tsx cannot locate data-username. We import the module (which
+      registers window.CorsaEmbed) and then call mountTo manually.
+    -->
+    <script type="module">
+      import "/src/main.tsx";
+      window.CorsaEmbed?.mount({
+        container: document.getElementById("corsa-embed"),
+        username: "findingmydirt",
+        streamId: "be5e8869-6481-4748-b985-b9004d95bd99",
+      });
     </script>
   </body>
 </html>
