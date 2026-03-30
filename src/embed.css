@@ -22,22 +22,54 @@
 .ce-stream-page {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   color: #e0e0e0;
-  background: #121212;
-  border-radius: 12px;
-  overflow: hidden;
+  background: #0f0f0f;
+  border-radius: 14px;
   max-width: 900px;
   margin: 0 auto;
-  padding: 0;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ---- Shared card / section card ---- */
+.ce-section-card {
+  background: #1e1e1e;
+  border-radius: 10px;
+  border: 1px solid #2a2a2a;
+  overflow: hidden;
+}
+
+/* ---- Section header (used inside section cards) ---- */
+.ce-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px 10px;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.ce-section-icon {
+  color: #e53935;
+  font-size: 14px;
+}
+
+.ce-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.9px;
+  color: #aaa;
+  margin: 0;
 }
 
 /* ---- Profile Card ---- */
 .ce-profile-card {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  padding: 20px;
   background: #1e1e1e;
-  border-bottom: 1px solid #2a2a2a;
+  border-radius: 10px;
+  border: 1px solid #2a2a2a;
+  padding: 16px 18px 0;
+  overflow: hidden;
 }
 
 .ce-profile-avatar-wrapper {
@@ -75,6 +107,7 @@
   padding: 2px 6px;
   border-radius: 4px;
   letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 
 .ce-profile-info {
@@ -108,33 +141,30 @@
   color: #e53935;
 }
 
-.ce-profile-stats {
+/* ---- Profile stats row (inside the profile card) ---- */
+.ce-profile-stats-row {
   display: flex;
-  gap: 16px;
-  flex-direction: column;
-  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 0;
+  margin-top: 14px;
+  border-top: 1px solid #2a2a2a;
+  margin-left: -18px;
+  margin-right: -18px;
 }
 
-.ce-stat {
+.ce-profile-stats-row .ce-stat-item {
+  flex: 1 1 auto;
   text-align: center;
+  padding: 10px 12px;
+  min-width: 80px;
+  border-right: 1px solid #2a2a2a;
 }
 
-.ce-stat-value {
-  display: block;
-  font-size: 15px;
-  font-weight: 700;
-  color: #fff;
+.ce-profile-stats-row .ce-stat-item:last-child {
+  border-right: none;
 }
 
-.ce-stat-label {
-  display: block;
-  font-size: 11px;
-  color: #888;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-/* ---- Stats Bar ---- */
+/* ---- Stats Bar (legacy – kept for compat) ---- */
 .ce-stats-bar {
   display: flex;
   justify-content: space-around;
@@ -151,7 +181,7 @@
 }
 
 .ce-stat-item .ce-stat-label {
-  font-size: 11px;
+  font-size: 10px;
   color: #888;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -160,7 +190,7 @@
 }
 
 .ce-stat-item .ce-stat-value {
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 700;
   color: #fff;
 }
@@ -226,9 +256,11 @@
 
 /* ---- Activity Chart ---- */
 .ce-activity-chart {
-  padding: 16px 20px;
-  background: #1a1a1a;
-  border-top: 1px solid #2a2a2a;
+  padding: 0;
+}
+
+.ce-activity-chart-body {
+  padding: 12px 16px 16px;
 }
 
 .ce-chart-empty {
@@ -238,23 +270,9 @@
   font-size: 13px;
 }
 
-/* ---- Section titles ---- */
-.ce-section-title {
-  font-size: 14px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  color: #aaa;
-  margin: 0 0 12px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #2a2a2a;
-}
-
 /* ---- Chat ---- */
 .ce-chat {
-  padding: 16px 20px;
-  background: #1a1a1a;
-  border-top: 1px solid #2a2a2a;
+  padding: 0 0 14px;
 }
 
 .ce-chat-messages {
@@ -263,13 +281,14 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  padding: 12px 16px 0;
 }
 
 .ce-chat-empty {
   color: #666;
   font-size: 13px;
   text-align: center;
-  padding: 8px 0;
+  padding: 12px 16px;
 }
 
 .ce-chat-message {
@@ -327,9 +346,14 @@
 
 /* ---- Feed / Posts ---- */
 .ce-feed {
-  padding: 16px 20px;
-  background: #1a1a1a;
-  border-top: 1px solid #2a2a2a;
+  padding: 0 0 14px;
+}
+
+.ce-feed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 12px 16px 0;
 }
 
 .ce-post {

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Dialog } from "primereact/dialog";
-import { Divider } from "primereact/divider";
 import type { Post, StatusPost } from "../generated/schema";
 import { resolveImageUrl } from "../utils/userImages";
 import { formatTimestamp } from "../utils/time";
@@ -22,16 +21,13 @@ export function Feed({ posts }: FeedProps) {
   }
 
   return (
-    <div className="ce-feed p-4 bg-[#1a1a1a] border-t border-[#2a2a2a]">
-      <div className="flex items-center gap-2 mb-3">
-        <i className="pi pi-images text-[#e53935]" />
-        <span className="text-xs font-bold uppercase tracking-widest text-[#aaa]">
-          Posts
-        </span>
+    <div className="ce-feed ce-section-card">
+      <div className="ce-section-header">
+        <i className="pi pi-images ce-section-icon" />
+        <span className="ce-section-title">Posts</span>
       </div>
-      <Divider className="!mt-0 !mb-3 !border-[#2a2a2a]" />
 
-      <div className="flex flex-col gap-4">
+      <div className="ce-feed-list">
         {statusPosts.map((post, i) => {
           const imageUrl = post.imagePath
             ? resolveImageUrl(post.imagePath)

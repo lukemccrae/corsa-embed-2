@@ -1,4 +1,3 @@
-import { Divider } from "primereact/divider";
 import type { Waypoint } from "../generated/schema";
 import {
   LineChart,
@@ -65,15 +64,13 @@ export function ActivityChart({ waypoints }: ActivityChartProps) {
   const hasAltitude = data.some((d) => d.altitude !== undefined);
 
   return (
-    <div className="ce-activity-chart p-4 bg-[#1a1a1a] border-t border-[#2a2a2a]">
-      <div className="flex items-center gap-2 mb-3">
-        <i className="pi pi-chart-line text-[#e53935]" />
-        <span className="text-xs font-bold uppercase tracking-widest text-[#aaa]">
-          Elevation Profile
-        </span>
+    <div className="ce-activity-chart">
+      <div className="ce-section-header">
+        <i className="pi pi-chart-line ce-section-icon" />
+        <span className="ce-section-title">Elevation Profile</span>
       </div>
-      <Divider className="!mt-0 !mb-3 !border-[#2a2a2a]" />
-      <ResponsiveContainer width="100%" height={220}>
+      <div className="ce-activity-chart-body">
+        <ResponsiveContainer width="100%" height={220}>
         <LineChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#333" />
           <XAxis
@@ -102,6 +99,7 @@ export function ActivityChart({ waypoints }: ActivityChartProps) {
           )}
         </LineChart>
       </ResponsiveContainer>
+      </div>
     </div>
   );
 }

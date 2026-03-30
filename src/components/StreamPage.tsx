@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Divider } from "primereact/divider";
 import type {
   User,
   LiveStream,
@@ -17,7 +16,6 @@ import { ActivityChart } from "./ActivityChart";
 import { Chat } from "./Chat";
 import { Feed } from "./Feed";
 import { LoadingSkeleton } from "./LoadingSkeleton";
-import { formatTimestamp } from "../utils/time";
 
 interface StreamPageProps {
   username: string;
@@ -128,93 +126,45 @@ export function StreamPage({ username, streamId }: StreamPageProps) {
   const posts: Post[] =
     stream.posts?.filter((p): p is Post => p != null) ?? [];
 
-  const hasStats =
-    stream.mileMarker != null ||
-    stream.startTime ||
-    stream.finishTime ||
-    stream.device?.make;
-
   return (
     <div className="ce-stream-page">
+      {/* Profile header card */}
       <ProfileCard user={user} stream={stream} />
 
-      {/* Stream stats bar */}
-      {hasStats && (
-        <div className="flex flex-wrap justify-around gap-3 px-5 py-3.5 bg-[#1a1a1a] border-b border-[#2a2a2a]">
-          {stream.mileMarker != null && (
-            <div className="text-center min-w-[80px]">
-              <span className="block text-[11px] text-[#888] uppercase tracking-wide mb-0.5">
-                Mile Marker
-              </span>
-              <span className="block text-lg font-bold text-white">
-                {stream.mileMarker.toFixed(1)} mi
-              </span>
-            </div>
-          )}
-          {stream.startTime && (
-            <div className="text-center min-w-[80px]">
-              <span className="block text-[11px] text-[#888] uppercase tracking-wide mb-0.5">
-                Started
-              </span>
-              <span className="block text-lg font-bold text-white">
-                {formatTimestamp(stream.startTime)}
-              </span>
-            </div>
-          )}
-          {stream.finishTime && (
-            <div className="text-center min-w-[80px]">
-              <span className="block text-[11px] text-[#888] uppercase tracking-wide mb-0.5">
-                Finished
-              </span>
-              <span className="block text-lg font-bold text-white">
-                {formatTimestamp(stream.finishTime)}
-              </span>
-            </div>
-          )}
-          {stream.device?.make && (
-            <div className="text-center min-w-[80px]">
-              <span className="block text-[11px] text-[#888] uppercase tracking-wide mb-0.5">
-                Device
-              </span>
-              <span className="block text-lg font-bold text-white">
-                {stream.device.make}
-              </span>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Map */}
+      {/* Map card */}
       {waypoints.length > 0 && (
-        <>
-          <div className="flex items-center gap-2 px-5 pt-4 pb-0 bg-[#1a1a1a]">
-            <i className="pi pi-map text-[#e53935]" />
-            <span className="text-xs font-bold uppercase tracking-widest text-[#aaa]">
-              Route Map
-            </span>
+        <div className="ce-section-card ce-map-panel">
+          <div className="ce-section-header">
+            <i className="pi pi-map ce-section-icon" />
+            <span className="ce-section-title">Route Map</span>
           </div>
-          <Divider className="!mt-2 !mb-0 !mx-5 !border-[#2a2a2a]" />
           <StreamMap
             waypoints={waypoints}
             trackerPosition={trackerPosition}
             posts={posts}
           />
-        </>
+        </div>
       )}
 
-      {/* Activity chart */}
-      {waypoints.length > 1 && <ActivityChart waypoints={waypoints} />}
+      {/* Activity chart card */}
+      {waypoints.length > 1 && (
+        <div className="ce-section-card">
+          <ActivityChart waypoints={waypoints} />
+        </div>
+      )}
 
-      {/* Live chat */}
+      {/* Live chat card */}
       {apiToken && (
-        <Chat
-          streamId={streamId}
-          initialMessages={chatMessages}
-          apiToken={apiToken}
-        />
+        <div className="ce-section-card">
+          <Chat
+            streamId={streamId}
+            initialMessages={chatMessages}
+            apiToken={apiToken}
+          />
+        </div>
       )}
 
-      {/* Posts / feed */}
+      {/* Posts / feed card */}
       <Feed posts={posts} />
     </div>
   );
