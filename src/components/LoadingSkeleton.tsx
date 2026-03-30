@@ -1,24 +1,23 @@
+import { Skeleton } from "primereact/skeleton";
+
 export function LoadingSkeleton() {
   return (
-    <div className="ce-skeleton">
+    <div className="p-5 bg-[#121212] rounded-xl max-w-[900px] mx-auto">
       {/* Profile card skeleton */}
-      <div className="ce-skeleton-card">
-        <div className="ce-skeleton-avatar ce-skeleton-pulse" />
-        <div className="ce-skeleton-lines">
-          <div className="ce-skeleton-line ce-skeleton-pulse" style={{ width: "60%" }} />
-          <div className="ce-skeleton-line ce-skeleton-pulse" style={{ width: "40%" }} />
-          <div className="ce-skeleton-line ce-skeleton-pulse" style={{ width: "80%" }} />
+      <div className="flex gap-4 mb-5">
+        <Skeleton shape="circle" size="72px" className="!bg-[#2a2a2a] flex-shrink-0" />
+        <div className="flex-1 flex flex-col gap-2.5 pt-1">
+          <Skeleton width="60%" height="14px" className="!bg-[#2a2a2a]" />
+          <Skeleton width="40%" height="14px" className="!bg-[#2a2a2a]" />
+          <Skeleton width="80%" height="14px" className="!bg-[#2a2a2a]" />
         </div>
       </div>
       {/* Map skeleton */}
-      <div
-        className="ce-skeleton-map ce-skeleton-pulse"
-        style={{ height: 300 }}
-      />
+      <Skeleton width="100%" height="300px" className="!bg-[#2a2a2a] !rounded-lg mb-5" />
       {/* Stats skeleton */}
-      <div className="ce-skeleton-stats">
+      <div className="flex gap-3">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="ce-skeleton-stat ce-skeleton-pulse" />
+          <Skeleton key={i} width="100%" height="48px" className="!bg-[#2a2a2a] !rounded-lg flex-1" />
         ))}
       </div>
     </div>

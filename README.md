@@ -2,6 +2,8 @@
 
 A React + TypeScript + Vite embed library that renders a live activity stream (map, chat, posts, profile) for the Corsa platform.
 
+The UI uses **PrimeReact** components with **Tailwind CSS** utility classes, styled to match the Corsa dark theme (dark blues and reds). All CSS is injected into the single-file JS bundle via `vite-plugin-css-injected-by-js` — no separate stylesheet is required.
+
 ## GraphQL Query Pattern
 
 This embed uses the same `getUserByUserName` + `liveStreams(streamId: ...)` query pattern as [corsa-next](https://github.com/lukemccrae/corsa-next), fetching all required data in a single round-trip:
@@ -51,6 +53,19 @@ All TypeScript types are sourced from `src/generated/schema.ts` (generated via G
 <script src="bundle.js"></script>
 <script>CorsaEmbed.mount(document.getElementById("embed"), { username: "alice", streamId: "stream-123" });</script>
 ```
+
+> **No additional CSS files needed.** PrimeReact (lara-dark-blue theme), PrimeIcons, and Tailwind
+> CSS utilities are all bundled into `bundle.js` by `vite-plugin-css-injected-by-js`.
+
+## Map Features
+
+- The route polyline is rendered in red on top of an OpenStreetMap tile layer.
+- **Post markers** appear on the map at each post's GPS location:
+  - Blue circle icon for text-only posts.
+  - Red circle icon for posts with images.
+  - Overlapping posts are spread slightly so they remain individually clickable.
+  - Clicking a marker opens a detail popup with the post text and (if present) a thumbnail image.
+  - Clicking the thumbnail opens a full-screen lightbox dialog.
 
 ## Development
 
