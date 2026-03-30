@@ -16,14 +16,18 @@
     "@graphql-codegen/introspection": "^5.0.0",
     "@graphql-codegen/typescript-graphql-request": "^6.3.0",
     "@graphql-codegen/typescript-react-query": "^6.1.1",
+    "@tailwindcss/vite": "^4.2.2",
     "firebase": "^12.11.0",
     "graphql": "^16.13.2",
     "leaflet": "^1.9.4",
+    "primeicons": "^7.0.0",
+    "primereact": "^10.9.7",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-is": "^19.2.4",
     "react-leaflet": "^5.0.0",
-    "recharts": "^3.8.1"
+    "recharts": "^3.8.1",
+    "tailwindcss": "^4.2.2"
   },
   "devDependencies": {
     "@aws-sdk/client-s3": "^3.1019.0",

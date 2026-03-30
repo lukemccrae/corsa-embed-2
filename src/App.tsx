@@ -1,3 +1,4 @@
+import { PrimeReactProvider } from "primereact/api";
 import { UserProvider } from "./context/UserContext";
 import { StreamPage } from "./components/StreamPage";
 import "./embed.css";
@@ -9,9 +10,10 @@ interface AppProps {
 
 export default function App({ username, streamId }: AppProps) {
   return (
-    <UserProvider>
-      <StreamPage username={username} streamId={streamId} />
-      <div>hello</div>
-    </UserProvider>
+    <PrimeReactProvider>
+      <UserProvider>
+        <StreamPage username={username} streamId={streamId} />
+      </UserProvider>
+    </PrimeReactProvider>
   );
 }

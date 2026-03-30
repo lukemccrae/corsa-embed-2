@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Divider } from "primereact/divider";
 import type {
   User,
   LiveStream,
@@ -93,7 +94,11 @@ export function StreamPage({ username, streamId }: StreamPageProps) {
   }, [apiToken, stream, streamId]);
 
   if (authError) {
-    return <div className="ce-error">Auth error: {authError}</div>;
+    return (
+      <div className="p-6 text-[#ef9a9a] bg-[#1a1a1a] rounded-lg text-center text-sm">
+        Auth error: {authError}
+      </div>
+    );
   }
 
   if (!isReady || loading) {
@@ -101,12 +106,20 @@ export function StreamPage({ username, streamId }: StreamPageProps) {
   }
 
   if (error) {
-    console.log('error loading stream data', error);
-    return <div className="ce-error">Error: {error}</div>;
+    console.log("error loading stream data", error);
+    return (
+      <div className="p-6 text-[#ef9a9a] bg-[#1a1a1a] rounded-lg text-center text-sm">
+        Error: {error}
+      </div>
+    );
   }
 
   if (!user || !stream) {
-    return <div className="ce-error">Stream not found.</div>;
+    return (
+      <div className="p-6 text-[#ef9a9a] bg-[#1a1a1a] rounded-lg text-center text-sm">
+        Stream not found.
+      </div>
+    );
   }
 
   const trackerPosition =
@@ -115,47 +128,78 @@ export function StreamPage({ username, streamId }: StreamPageProps) {
   const posts: Post[] =
     stream.posts?.filter((p): p is Post => p != null) ?? [];
 
+  const hasStats =
+    stream.mileMarker != null ||
+    stream.startTime ||
+    stream.finishTime ||
+    stream.device?.make;
+
   return (
     <div className="ce-stream-page">
       <ProfileCard user={user} stream={stream} />
 
       {/* Stream stats bar */}
-      <div className="ce-stats-bar">
-        {stream.mileMarker != null && (
-          <div className="ce-stat-item">
-            <span className="ce-stat-label">Mile Marker</span>
-            <span className="ce-stat-value">
-              {stream.mileMarker.toFixed(1)} mi
-            </span>
-          </div>
-        )}
-        {stream.startTime && (
-          <div className="ce-stat-item">
-            <span className="ce-stat-label">Started</span>
-            <span className="ce-stat-value">
-              {formatTimestamp(stream.startTime)}
-            </span>
-          </div>
-        )}
-        {stream.finishTime && (
-          <div className="ce-stat-item">
-            <span className="ce-stat-label">Finished</span>
-            <span className="ce-stat-value">
-              {formatTimestamp(stream.finishTime)}
-            </span>
-          </div>
-        )}
-        {stream.device?.make && (
-          <div className="ce-stat-item">
-            <span className="ce-stat-label">Device</span>
-            <span className="ce-stat-value">{stream.device.make}</span>
-          </div>
-        )}
-      </div>
+      {hasStats && (
+        <div className="flex flex-wrap justify-around gap-3 px-5 py-3.5 bg-[#1a1a1a] border-b border-[#2a2a2a]">
+          {stream.mileMarker != null && (
+            <div className="text-center min-w-[80px]">
+              <span className="block text-[11px] text-[#888] uppercase tracking-wide mb-0.5">
+                Mile Marker
+              </span>
+              <span className="block text-lg font-bold text-white">
+                {stream.mileMarker.toFixed(1)} mi
+              </span>
+            </div>
+          )}
+          {stream.startTime && (
+            <div className="text-center min-w-[80px]">
+              <span className="block text-[11px] text-[#888] uppercase tracking-wide mb-0.5">
+                Started
+              </span>
+              <span className="block text-lg font-bold text-white">
+                {formatTimestamp(stream.startTime)}
+              </span>
+            </div>
+          )}
+          {stream.finishTime && (
+            <div className="text-center min-w-[80px]">
+              <span className="block text-[11px] text-[#888] uppercase tracking-wide mb-0.5">
+                Finished
+              </span>
+              <span className="block text-lg font-bold text-white">
+                {formatTimestamp(stream.finishTime)}
+              </span>
+            </div>
+          )}
+          {stream.device?.make && (
+            <div className="text-center min-w-[80px]">
+              <span className="block text-[11px] text-[#888] uppercase tracking-wide mb-0.5">
+                Device
+              </span>
+              <span className="block text-lg font-bold text-white">
+                {stream.device.make}
+              </span>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Map */}
       {waypoints.length > 0 && (
-        <StreamMap waypoints={waypoints} trackerPosition={trackerPosition} />
+        <>
+          <div className="flex items-center gap-2 px-5 pt-4 pb-0 bg-[#1a1a1a]">
+            <i className="pi pi-map text-[#e53935]" />
+            <span className="text-xs font-bold uppercase tracking-widest text-[#aaa]">
+              Route Map
+            </span>
+          </div>
+          <Divider className="!mt-2 !mb-0 !mx-5 !border-[#2a2a2a]" />
+          <StreamMap
+            waypoints={waypoints}
+            trackerPosition={trackerPosition}
+            posts={posts}
+          />
+        </>
       )}
 
       {/* Activity chart */}

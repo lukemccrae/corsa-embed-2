@@ -4,7 +4,15 @@
    the host page's styles.
    ========================================================= */
 
-/* Reset / base */
+/* Tailwind utilities only – no preflight/base to avoid polluting the host page */
+@import "tailwindcss/utilities";
+
+/* PrimeReact Aura Dark theme */
+@import "primereact/resources/themes/lara-dark-blue/theme.css";
+@import "primereact/resources/primereact.min.css";
+@import "primeicons/primeicons.css";
+
+
 .ce-stream-page *,
 .ce-stream-page *::before,
 .ce-stream-page *::after {
@@ -182,6 +190,38 @@
   0%   { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.6); }
   70%  { box-shadow: 0 0 0 10px rgba(229, 57, 53, 0); }
   100% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0); }
+}
+
+/* Post markers on the map */
+.ce-post-marker {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #1e1e1e;
+  border: 2px solid #4fc3f7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+  transition: transform 0.15s ease;
+}
+
+.ce-post-marker:hover {
+  transform: scale(1.2);
+}
+
+.ce-post-marker .pi {
+  font-size: 13px;
+  color: #4fc3f7;
+}
+
+.ce-post-marker--image {
+  border-color: #e53935;
+}
+
+.ce-post-marker--image .pi {
+  color: #e53935;
 }
 
 /* ---- Activity Chart ---- */
