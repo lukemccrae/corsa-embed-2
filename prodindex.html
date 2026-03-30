@@ -1,14 +1,19 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Corsa Embed (dev)</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CORSA Embed – findingmydirt</title>
   </head>
+
   <body>
+    <!-- The embed bundle will auto-mount into this div (or one it creates).
+         Keeping a dedicated container makes it predictable. -->
     <div id="corsa-embed"></div>
+
+    <!-- Load the single-file embed bundle -->
     <script
-      src="/dist-singlefile/bundle.js"
+      src="https://d2ugbf2pkr6nwe.cloudfront.net/corsa-bundle.js"
       data-username="findingmydirt"
       data-stream-id="be5e8869-6481-4748-b985-b9004d95bd99"
       data-mount="#corsa-embed"

@@ -29,7 +29,7 @@ interface StreamProfileResponse {
 }
 
 export function StreamPage({ username, streamId }: StreamPageProps) {
-  console.log(username, streamId, "StreamPage props");
+  console.log(username, streamId, "StreamPage propssss");
   const { apiToken, isReady, error: authError } = useUser();
   const [user, setUser] = useState<User | null>(null);
   const [stream, setStream] = useState<LiveStream | null>(null);
