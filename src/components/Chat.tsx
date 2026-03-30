@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Divider } from "primereact/divider";
 import type { ChatMessage } from "../generated/schema";
 import { appsyncSubscribe } from "../helpers/appsync-subscription.helper";
 import { ON_NEW_CHAT } from "../helpers/queries";
@@ -36,38 +37,55 @@ export function Chat({ streamId, initialMessages, apiToken }: ChatProps) {
   }, [streamId, apiToken]);
 
   return (
-    <div className="ce-chat">
-      <h3 className="ce-section-title">Live Chat</h3>
-      <div className="ce-chat-messages">
+    <div className="ce-chat p-4 bg-[#1a1a1a] border-t border-[#2a2a2a]">
+      <div className="flex items-center gap-2 mb-3">
+        <i className="pi pi-comments text-[#e53935]" />
+        <span className="text-xs font-bold uppercase tracking-widest text-[#aaa]">
+          Live Chat
+        </span>
+      </div>
+      <Divider className="!mt-0 !mb-3 !border-[#2a2a2a]" />
+
+      <div className="max-h-80 overflow-y-auto flex flex-col gap-3">
         {messages.length === 0 && (
-          <p className="ce-chat-empty">No messages yet. Be the first!</p>
+          <p className="text-[#666] text-sm text-center py-2">
+            No messages yet. Be the first!
+          </p>
         )}
         {messages.map((msg, i) => {
           const avatarUrl = resolveImageUrl(msg.publicUser.profilePicture);
           return (
             <div
               key={`${msg.createdAt}-${msg.userId}-${i}`}
-              className="ce-chat-message"
+              className="flex gap-2.5 items-start"
             >
-              <div className="ce-chat-avatar">
+              {/* Avatar */}
+              <div className="flex-shrink-0">
                 {avatarUrl ? (
                   <img
                     src={avatarUrl}
                     alt={msg.publicUser.username}
-                    className="ce-chat-avatar-img"
+                    className="w-9 h-9 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="ce-chat-avatar-placeholder">
+                  <div className="w-9 h-9 rounded-full bg-[#333] flex items-center justify-center text-xs font-bold text-white">
                     {initialsAvatar(msg.publicUser.username)}
                   </div>
                 )}
               </div>
-              <div className="ce-chat-content">
-                <span className="ce-chat-author">
-                  {msg.publicUser.username}
-                </span>
-                <span className="ce-chat-time">{relativeTime(msg.createdAt)}</span>
-                <p className="ce-chat-text">{msg.text}</p>
+              {/* Content */}
+              <div className="flex-1">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-sm font-semibold text-[#ddd]">
+                    {msg.publicUser.username}
+                  </span>
+                  <span className="text-[11px] text-[#666]">
+                    {relativeTime(msg.createdAt)}
+                  </span>
+                </div>
+                <p className="mt-0.5 text-sm text-[#ccc] break-words">
+                  {msg.text}
+                </p>
               </div>
             </div>
           );

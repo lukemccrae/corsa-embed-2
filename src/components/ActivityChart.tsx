@@ -1,3 +1,4 @@
+import { Divider } from "primereact/divider";
 import type { Waypoint } from "../generated/schema";
 import {
   LineChart,
@@ -54,7 +55,9 @@ function buildChartData(waypoints: Waypoint[]): ChartPoint[] {
 export function ActivityChart({ waypoints }: ActivityChartProps) {
   if (waypoints.length < 2) {
     return (
-      <div className="ce-chart-empty">Not enough data to show chart.</div>
+      <div className="p-4 text-center text-sm text-[#666]">
+        Not enough data to show chart.
+      </div>
     );
   }
 
@@ -62,21 +65,30 @@ export function ActivityChart({ waypoints }: ActivityChartProps) {
   const hasAltitude = data.some((d) => d.altitude !== undefined);
 
   return (
-    <div className="ce-activity-chart">
+    <div className="ce-activity-chart p-4 bg-[#1a1a1a] border-t border-[#2a2a2a]">
+      <div className="flex items-center gap-2 mb-3">
+        <i className="pi pi-chart-line text-[#e53935]" />
+        <span className="text-xs font-bold uppercase tracking-widest text-[#aaa]">
+          Elevation Profile
+        </span>
+      </div>
+      <Divider className="!mt-0 !mb-3 !border-[#2a2a2a]" />
       <ResponsiveContainer width="100%" height={220}>
         <LineChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#333" />
           <XAxis
             dataKey="dist"
             label={{ value: "km", position: "insideBottomRight", offset: -4 }}
-            tick={{ fontSize: 11 }}
+            tick={{ fontSize: 11, fill: "#999" }}
           />
-          <YAxis yAxisId="left" tick={{ fontSize: 11 }} />
+          <YAxis yAxisId="left" tick={{ fontSize: 11, fill: "#999" }} />
           <Tooltip
-            contentStyle={{ background: "#1a1a1a", border: "1px solid #444" }}
+            contentStyle={{ background: "#1e1e1e", border: "1px solid #333", borderRadius: "8px" }}
             labelFormatter={(v) => `${v as number} km`}
+            labelStyle={{ color: "#aaa" }}
+            itemStyle={{ color: "#4fc3f7" }}
           />
-          <Legend />
+          <Legend wrapperStyle={{ color: "#aaa", fontSize: "12px" }} />
           {hasAltitude && (
             <Line
               yAxisId="left"
