@@ -1,45 +1,57 @@
-/** Format seconds → "h:mm:ss" or "m:ss" */
-export function formatDuration(seconds?: number): string {
-  if (seconds === undefined || seconds === null) return "--";
-  const s = Math.round(seconds);
-  const h = Math.floor(s / 3600);
-  const m = Math.floor((s % 3600) / 60);
-  const sec = s % 60;
-  if (h > 0) {
-    return `${h}:${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+/**
+ * Parses a date value (ISO string, numeric epoch string, or Date) into
+ * milliseconds since epoch. Returns null for missing or invalid input.
+ */
+export function parseDateTime(
+  value: string | Date | null | undefined,
+): number | null {
+  if (value == null) return null;
+  if (value instanceof Date) {
+    const ms = value.getTime();
+    return isNaN(ms) ? null : ms;
   }
-  return `${m}:${String(sec).padStart(2, "0")}`;
+  // Try ISO / human-readable string first
+  const fromStr = new Date(value).getTime();
+  if (!isNaN(fromStr)) return fromStr;
+  // Fallback: numeric epoch string (e.g. "1704067200000")
+  const fromNum = Number(value);
+  if (!isNaN(fromNum)) return fromNum;
+  return null;
 }
 
-/** Format metres → "X.XX km" */
-export function formatDistance(metres?: number): string {
-  if (metres === undefined || metres === null) return "--";
-  return `${(metres / 1000).toFixed(2)} km`;
+export function toDDHHMMSS(secs: number) {
+  const isNegative = secs < 0;
+  const absoluteSecs = Math.abs(Math.round(secs));
+
+  const days = Math.floor(absoluteSecs / 86400);
+  const hours = Math.floor((absoluteSecs % 86400) / 3600);
+  const minutes = Math.floor((absoluteSecs % 3600) / 60);
+  const seconds = absoluteSecs % 60;
+
+  const formattedDays = days.toString().padStart(2, "0");
+  const formattedHours = hours.toString().padStart(2, "0");
+  const formattedMinutes = minutes.toString().padStart(2, "0");
+  const formattedSeconds = seconds.toString().padStart(2, "0");
+
+  const timeString = `${formattedDays}d ${formattedHours}h ${formattedMinutes}m ${formattedSeconds}s`;
+
+  return isNegative ? `- ${timeString}` : timeString;
 }
 
-/** Format a pace in seconds/km → "m:ss /km" */
-export function formatPace(secPerKm?: number): string {
-  if (!secPerKm) return "--";
-  const m = Math.floor(secPerKm / 60);
-  const s = Math.round(secPerKm % 60);
-  return `${m}:${String(s).padStart(2, "0")} /km`;
-}
 
-/** Format an ISO timestamp to a readable local string */
-export function formatTimestamp(iso?: string): string {
-  if (!iso) return "";
-  return new Date(iso).toLocaleString();
-}
+export function toDDHHMM(secs: number) {
+  const isNegative = secs < 0;
+  const absoluteSecs = Math.abs(Math.round(secs));
 
-/** Relative time from now (e.g. "3 min ago") */
-export function relativeTime(iso?: string): string {
-  if (!iso) return "";
-  const diffMs = Date.now() - new Date(iso).getTime();
-  const diffSec = Math.floor(diffMs / 1000);
-  if (diffSec < 60) return `${diffSec}s ago`;
-  const diffMin = Math.floor(diffSec / 60);
-  if (diffMin < 60) return `${diffMin}m ago`;
-  const diffHr = Math.floor(diffMin / 60);
-  if (diffHr < 24) return `${diffHr}h ago`;
-  return formatTimestamp(iso);
+  const days = Math.floor(absoluteSecs / 86400);
+  const hours = Math.floor((absoluteSecs % 86400) / 3600);
+  const minutes = Math.floor((absoluteSecs % 3600) / 60);
+
+  const formattedDays = days.toString().padStart(2, "0");
+  const formattedHours = hours.toString().padStart(2, "0");
+  const formattedMinutes = minutes.toString().padStart(2, "0");
+
+  const timeString = `${formattedDays}d ${formattedHours}h ${formattedMinutes}m`;
+
+  return isNegative ? `- ${timeString}` : timeString;
 }

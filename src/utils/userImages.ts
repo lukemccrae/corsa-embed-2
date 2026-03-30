@@ -1,22 +1,27 @@
-import { domainConfig } from "../context/DomainContext";
+import type { User } from "../generated/schema";
+import { domain } from "../context/domain.context";
+
+const FALLBACK_COVER_IMAGE = "https://i.imgur.com/pVsCWkO.png";
 
 /**
- * Resolve a CDN image key to a full URL.
- * If the key is already an absolute URL, return it as-is.
+ * Returns the best available cover image URL for a user.
+ * Prefers `coverImagePath` when present, falls back to the default cover image.
  */
-export function resolveImageUrl(key?: string | null): string | null {
-  if (!key) return null;
-  if (key.startsWith("http://") || key.startsWith("https://")) return key;
-  const base = domainConfig.cdnBase;
-  return base ? `${base}/${key}` : key;
+export function getCoverImageUrl(user: Pick<User, "coverImagePath">): string {
+  return user.coverImagePath
+    ? `${domain.userImagesCdnBaseUrl}/${user.coverImagePath}`
+    : FALLBACK_COVER_IMAGE;
 }
 
-/** Generate an avatar placeholder with initials */
-export function initialsAvatar(displayName: string): string {
-  const parts = displayName.trim().split(/\s+/);
-  const initials =
-    parts.length >= 2
-      ? `${parts[0][0]}${parts[parts.length - 1][0]}`
-      : displayName.slice(0, 2);
-  return initials.toUpperCase();
+export function getProfilePictureUrl(
+  user: Pick<User, "profilePicture">,
+): string {
+  return `${domain.userImagesCdnBaseUrl}/${user.profilePicture}`;
+}
+
+/**
+ * Returns the public CloudFront URL for a post image given its S3 object key.
+ */
+export function getPostImageUrl(objectKey: string): string {
+  return `${domain.postImagesCdnBaseUrl}/${objectKey}`;
 }

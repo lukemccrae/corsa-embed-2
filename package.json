@@ -17,10 +17,12 @@
     "@graphql-codegen/introspection": "^5.0.0",
     "@graphql-codegen/typescript-graphql-request": "^6.3.0",
     "@graphql-codegen/typescript-react-query": "^6.1.1",
+    "@tailwindcss/postcss": "^4.1.16",
     "@tailwindcss/vite": "^4.2.2",
     "firebase": "^12.11.0",
     "graphql": "^16.13.2",
     "leaflet": "^1.9.4",
+    "next": "^16.2.1",
     "primeicons": "^7.0.0",
     "primereact": "^10.9.7",
     "react": "^19.2.4",
@@ -28,7 +30,8 @@
     "react-is": "^19.2.4",
     "react-leaflet": "^5.0.0",
     "recharts": "^3.8.1",
-    "tailwindcss": "^4.2.2"
+    "tailwind": "^4.0.0",
+    "tailwindcss": "^4.1.16"
   },
   "devDependencies": {
     "@aws-sdk/client-s3": "^3.1019.0",
@@ -37,7 +40,7 @@
     "@graphql-codegen/typescript": "^5.0.6",
     "@graphql-codegen/typescript-operations": "^5.0.6",
     "@types/leaflet": "^1.9.21",
-    "@types/node": "^24.12.0",
+    "@types/node": "^25.5.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",

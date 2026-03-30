@@ -10,12 +10,11 @@ import { appsyncRequest } from "../helpers/appsync.helper";
 import { appsyncSubscribe } from "../helpers/appsync-subscription.helper";
 import { STREAM_PROFILE_QUERY, ON_NEW_WAYPOINT } from "../helpers/queries";
 import { useUser } from "../context/useUser";
-import { ProfileCard } from "./ProfileCard";
-import { StreamMap } from "./StreamMap";
 import { ActivityChart } from "./ActivityChart";
-import { Chat } from "./Chat";
-import { Feed } from "./Feed";
 import { LoadingSkeleton } from "./LoadingSkeleton";
+import ProfileCard from "./ProfileCard";
+import LiveProfileCard from "./ProfileCard";
+import { getProfilePictureUrl } from "../utils/userImages";
 
 interface StreamPageProps {
   username: string;
@@ -27,7 +26,6 @@ interface StreamProfileResponse {
 }
 
 export function StreamPage({ username, streamId }: StreamPageProps) {
-  console.log(username, streamId, "StreamPage propssss");
   const { apiToken, isReady, error: authError } = useUser();
   const [user, setUser] = useState<User | null>(null);
   const [stream, setStream] = useState<LiveStream | null>(null);
@@ -47,7 +45,7 @@ export function StreamPage({ username, streamId }: StreamPageProps) {
         const data = await appsyncRequest<StreamProfileResponse>(
           STREAM_PROFILE_QUERY(username, streamId),
           {},
-          token
+          token,
         );
 
         const userData = data.getUserByUserName;
@@ -56,16 +54,16 @@ export function StreamPage({ username, streamId }: StreamPageProps) {
         const liveStream = userData.liveStreams?.[0] ?? null;
         setStream(liveStream);
         setWaypoints(
-          liveStream?.waypoints?.filter((w): w is Waypoint => w != null) ?? []
+          liveStream?.waypoints?.filter((w): w is Waypoint => w != null) ?? [],
         );
         setChatMessages(
           liveStream?.chatMessages?.filter(
-            (m): m is ChatMessage => m != null
-          ) ?? []
+            (m): m is ChatMessage => m != null,
+          ) ?? [],
         );
       } catch (err) {
         setError(
-          err instanceof Error ? err.message : "Failed to load stream data"
+          err instanceof Error ? err.message : "Failed to load stream data",
         );
       } finally {
         setLoading(false);
@@ -86,7 +84,7 @@ export function StreamPage({ username, streamId }: StreamPageProps) {
         if (data.onNewWaypoint) {
           setWaypoints((prev) => [...prev, data.onNewWaypoint]);
         }
-      }
+      },
     );
     return unsub;
   }, [apiToken, stream, streamId]);
@@ -123,13 +121,38 @@ export function StreamPage({ username, streamId }: StreamPageProps) {
   const trackerPosition =
     waypoints.length > 0 ? waypoints[waypoints.length - 1] : undefined;
 
-  const posts: Post[] =
-    stream.posts?.filter((p): p is Post => p != null) ?? [];
+  const posts: Post[] = stream.posts?.filter((p): p is Post => p != null) ?? [];
+
+    if (
+    !user.liveStreams ||
+    user.liveStreams.length === 0 ||
+    !user.liveStreams[0]
+  ) {
+    return null;
+  }
+
+  const startTime = new Date(user.liveStreams[0].startTime);
+  const finishTime = user.liveStreams[0].finishTime ?? null;
+
+  // A stream is live when the backend live flag is set AND it hasn't finished yet.
+  const isLive = !!(user.liveStreams[0].live && !finishTime);
 
   return (
     <div className="ce-stream-page">
       {/* Profile header card */}
-      <ProfileCard user={user} stream={stream} />
+      <LiveProfileCard
+        username={user.username}
+        profilePicture={getProfilePictureUrl({
+          profilePicture: user.profilePicture,
+        })}
+        streamTitle={user.liveStreams?.[0]?.title}
+        startTime={startTime}
+        finishTime={finishTime}
+        timezone={stream.timezone}
+        isLive={isLive}
+        routeId={stream.route?.routeId ?? null}
+        routeName={stream.route?.name ?? null}
+      />
 
       {/* Map card */}
       {waypoints.length > 0 && (
@@ -138,23 +161,23 @@ export function StreamPage({ username, streamId }: StreamPageProps) {
             <i className="pi pi-map ce-section-icon" />
             <span className="ce-section-title">Route Map</span>
           </div>
-          <StreamMap
+          {/* <StreamMap
             waypoints={waypoints}
             trackerPosition={trackerPosition}
             posts={posts}
-          />
+          /> */}
         </div>
       )}
 
       {/* Activity chart card */}
-      {waypoints.length > 1 && (
+      {/* {waypoints.length > 1 && (
         <div className="ce-section-card">
           <ActivityChart waypoints={waypoints} />
         </div>
-      )}
+      )} */}
 
       {/* Live chat card */}
-      {apiToken && (
+      {/* {apiToken && (
         <div className="ce-section-card">
           <Chat
             streamId={streamId}
@@ -162,10 +185,9 @@ export function StreamPage({ username, streamId }: StreamPageProps) {
             apiToken={apiToken}
           />
         </div>
-      )}
+      )} */}
 
       {/* Posts / feed card */}
-      <Feed posts={posts} />
     </div>
   );
 }
