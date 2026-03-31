@@ -225,6 +225,8 @@ export function CoverMap({
                           color: "#ccc",
                           whiteSpace: "pre-wrap",
                           wordBreak: "break-word",
+                          maxHeight: 120,
+                          overflowY: "auto",
                         }}
                       >
                         {sp.text}
