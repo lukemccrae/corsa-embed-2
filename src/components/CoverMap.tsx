@@ -20,8 +20,7 @@ L.Icon.Default.mergeOptions({
   iconRetinaUrl:
     "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl:
-    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 });
 
 interface BoundsUpdaterProps {
@@ -69,7 +68,7 @@ export function CoverMap({
 
   const waypointPositions = useMemo<[number, number][]>(
     () => waypoints.map((w) => [w.lat, w.lng]),
-    [waypoints]
+    [waypoints],
   );
 
   const routePositions = useMemo<[number, number][]>(
@@ -77,7 +76,7 @@ export function CoverMap({
       routeGeoJson
         ? routeGeoJson.coordinates.map(([lng, lat]) => [lat, lng])
         : [],
-    [routeGeoJson]
+    [routeGeoJson],
   );
 
   const trackerPos: [number, number] | null =
@@ -106,10 +105,10 @@ export function CoverMap({
         const jitter = count * JITTER_DEGREES;
         return {
           post: p,
-          position: [
-            p.location!.lat + jitter,
-            p.location!.lng + jitter,
-          ] as [number, number],
+          position: [p.location!.lat + jitter, p.location!.lng + jitter] as [
+            number,
+            number,
+          ],
         };
       });
   }, [posts]);
@@ -126,19 +125,17 @@ export function CoverMap({
 
   return (
     <>
-      <div
-        className="w-full rounded-lg overflow-hidden"
-        style={{ height }}
-      >
+      <div className="w-full rounded-lg overflow-hidden" style={{ height }}>
         <MapContainer
           center={defaultCenter}
           zoom={11}
-          scrollWheelZoom={false}
+          scrollWheelZoom={true}
+          attributionControl={false}
           style={{ width: "100%", height: "100%" }}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
           />
           {allPositions.length > 0 && (
             <BoundsUpdater positions={allPositions} />
@@ -148,7 +145,12 @@ export function CoverMap({
           {routePositions.length > 1 && (
             <Polyline
               positions={routePositions}
-              pathOptions={{ color: "#6366f1", weight: 3, opacity: 0.6, dashArray: "6 4" }}
+              pathOptions={{
+                color: "#6366f1",
+                weight: 3,
+                opacity: 0.6,
+                dashArray: "6 4",
+              }}
             />
           )}
 
@@ -216,7 +218,15 @@ export function CoverMap({
                 <Popup>
                   <div style={{ maxWidth: 220, fontFamily: "sans-serif" }}>
                     {sp.text && (
-                      <p style={{ margin: "0 0 8px", fontSize: 13, color: "#ccc", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+                      <p
+                        style={{
+                          margin: "0 0 8px",
+                          fontSize: 13,
+                          color: "#ccc",
+                          whiteSpace: "pre-wrap",
+                          wordBreak: "break-word",
+                        }}
+                      >
                         {sp.text}
                       </p>
                     )}
