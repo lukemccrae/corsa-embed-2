@@ -1,14 +1,17 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   MapContainer,
   TileLayer,
   Polyline,
   CircleMarker,
+  Marker,
+  Popup,
   useMap,
 } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import type { Waypoint } from "../generated/schema";
+import type { Post, StatusPost, Waypoint } from "../generated/schema";
+import { getPostImageUrl } from "../utils/userImages";
 
 // Fix Leaflet default icon resolution (no bundler plugin needed)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -51,6 +54,8 @@ export interface CoverMapProps {
   isLive?: boolean;
   /** Map height in pixels, defaults to 360 */
   height?: number;
+  /** Stream posts to render as map markers (only those with a location are shown) */
+  posts?: Post[];
 }
 
 export function CoverMap({
@@ -58,7 +63,10 @@ export function CoverMap({
   routeGeoJson,
   isLive,
   height = 360,
+  posts = [],
 }: CoverMapProps) {
+  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
+
   const waypointPositions = useMemo<[number, number][]>(
     () => waypoints.map((w) => [w.lat, w.lng]),
     [waypoints]
@@ -84,83 +92,201 @@ export function CoverMap({
     ? waypointPositions
     : routePositions;
 
+  // Posts with GPS coordinates – spread overlapping pins by a tiny offset
+  // JITTER_DEGREES is ~9 m per overlapping post, enough to visually separate pins
+  const JITTER_DEGREES = 0.00008;
+  const locatedPosts = useMemo(() => {
+    const seen = new Map<string, number>();
+    return posts
+      .filter((p) => p.location?.lat != null && p.location?.lng != null)
+      .map((p) => {
+        const key = `${p.location!.lat.toFixed(6)},${p.location!.lng.toFixed(6)}`;
+        const count = seen.get(key) ?? 0;
+        seen.set(key, count + 1);
+        const jitter = count * JITTER_DEGREES;
+        return {
+          post: p,
+          position: [
+            p.location!.lat + jitter,
+            p.location!.lng + jitter,
+          ] as [number, number],
+        };
+      });
+  }, [posts]);
+
+  // Build custom DivIcons for post markers (text-only = blue, image = red)
+  const makePostIcon = (hasImage: boolean) =>
+    L.divIcon({
+      className: "",
+      html: `<div class="ce-post-marker${hasImage ? " ce-post-marker--image" : ""}"><i class="pi ${hasImage ? "pi-image" : "pi-comment"}"></i></div>`,
+      iconSize: [28, 28],
+      iconAnchor: [14, 14],
+      popupAnchor: [0, -16],
+    });
+
   return (
-    <div
-      className="w-full rounded-lg overflow-hidden"
-      style={{ height }}
-    >
-      <MapContainer
-        center={defaultCenter}
-        zoom={11}
-        scrollWheelZoom={false}
-        style={{ width: "100%", height: "100%" }}
+    <>
+      <div
+        className="w-full rounded-lg overflow-hidden"
+        style={{ height }}
       >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        {allPositions.length > 0 && (
-          <BoundsUpdater positions={allPositions} />
-        )}
-
-        {/* Reference route polyline (e.g. pre-planned GeoJSON route) */}
-        {routePositions.length > 1 && (
-          <Polyline
-            positions={routePositions}
-            pathOptions={{ color: "#6366f1", weight: 3, opacity: 0.6, dashArray: "6 4" }}
+        <MapContainer
+          center={defaultCenter}
+          zoom={11}
+          scrollWheelZoom={false}
+          style={{ width: "100%", height: "100%" }}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-        )}
+          {allPositions.length > 0 && (
+            <BoundsUpdater positions={allPositions} />
+          )}
 
-        {/* Live waypoint trail */}
-        {waypointPositions.length > 1 && (
-          <Polyline
-            positions={waypointPositions}
-            pathOptions={{ color: "#ef4444", weight: 4, opacity: 0.9 }}
-          />
-        )}
+          {/* Reference route polyline (e.g. pre-planned GeoJSON route) */}
+          {routePositions.length > 1 && (
+            <Polyline
+              positions={routePositions}
+              pathOptions={{ color: "#6366f1", weight: 3, opacity: 0.6, dashArray: "6 4" }}
+            />
+          )}
 
-        {/* Live tracker dot at current position */}
-        {trackerPos && isLive && (
-          <CircleMarker
-            center={trackerPos}
-            radius={8}
-            pathOptions={{
-              color: "#fff",
-              fillColor: "#ef4444",
-              fillOpacity: 1,
-              weight: 2,
-            }}
-          />
-        )}
+          {/* Live waypoint trail */}
+          {waypointPositions.length > 1 && (
+            <Polyline
+              positions={waypointPositions}
+              pathOptions={{ color: "#ef4444", weight: 4, opacity: 0.9 }}
+            />
+          )}
 
-        {/* Start/end markers when not live */}
-        {waypointPositions.length > 0 && !isLive && (
-          <>
+          {/* Live tracker dot at current position */}
+          {trackerPos && isLive && (
             <CircleMarker
-              center={waypointPositions[0]}
-              radius={6}
+              center={trackerPos}
+              radius={8}
               pathOptions={{
                 color: "#fff",
-                fillColor: "#22c55e",
+                fillColor: "#ef4444",
                 fillOpacity: 1,
                 weight: 2,
               }}
             />
-            {waypointPositions.length > 1 && (
+          )}
+
+          {/* Start/end markers when not live */}
+          {waypointPositions.length > 0 && !isLive && (
+            <>
               <CircleMarker
-                center={waypointPositions[waypointPositions.length - 1]}
+                center={waypointPositions[0]}
                 radius={6}
                 pathOptions={{
                   color: "#fff",
-                  fillColor: "#3b82f6",
+                  fillColor: "#22c55e",
                   fillOpacity: 1,
                   weight: 2,
                 }}
               />
-            )}
-          </>
-        )}
-      </MapContainer>
-    </div>
+              {waypointPositions.length > 1 && (
+                <CircleMarker
+                  center={waypointPositions[waypointPositions.length - 1]}
+                  radius={6}
+                  pathOptions={{
+                    color: "#fff",
+                    fillColor: "#3b82f6",
+                    fillOpacity: 1,
+                    weight: 2,
+                  }}
+                />
+              )}
+            </>
+          )}
+
+          {/* Post markers */}
+          {locatedPosts.map(({ post, position }, idx) => {
+            const sp = post as StatusPost;
+            const hasImage = !!sp.imagePath;
+            const imageUrl = hasImage ? getPostImageUrl(sp.imagePath!) : null;
+            return (
+              <Marker
+                key={`post-${post.createdAt}-${idx}`}
+                position={position}
+                icon={makePostIcon(hasImage)}
+              >
+                <Popup>
+                  <div style={{ maxWidth: 220, fontFamily: "sans-serif" }}>
+                    {sp.text && (
+                      <p style={{ margin: "0 0 8px", fontSize: 13, color: "#ccc", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+                        {sp.text}
+                      </p>
+                    )}
+                    {imageUrl && (
+                      <img
+                        src={imageUrl}
+                        alt="Post image"
+                        style={{
+                          width: "100%",
+                          borderRadius: 6,
+                          cursor: "zoom-in",
+                          display: "block",
+                          maxHeight: 160,
+                          objectFit: "cover",
+                        }}
+                        onClick={() => setLightboxSrc(imageUrl)}
+                      />
+                    )}
+                  </div>
+                </Popup>
+              </Marker>
+            );
+          })}
+        </MapContainer>
+      </div>
+
+      {/* Lightbox overlay */}
+      {lightboxSrc && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 9999,
+            background: "rgba(0,0,0,0.85)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          onClick={() => setLightboxSrc(null)}
+        >
+          <img
+            src={lightboxSrc}
+            alt="Full size"
+            style={{
+              maxWidth: "90vw",
+              maxHeight: "90vh",
+              borderRadius: 8,
+              boxShadow: "0 4px 32px rgba(0,0,0,0.8)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          />
+          <button
+            aria-label="Close"
+            style={{
+              position: "absolute",
+              top: 16,
+              right: 20,
+              background: "none",
+              border: "none",
+              color: "#fff",
+              fontSize: 32,
+              cursor: "pointer",
+              lineHeight: 1,
+            }}
+            onClick={() => setLightboxSrc(null)}
+          >
+            ×
+          </button>
+        </div>
+      )}
+    </>
   );
 }
