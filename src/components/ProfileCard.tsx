@@ -1,8 +1,5 @@
-"use client";
-import React, { useMemo, useEffect, useState } from "react";
-import { Avatar } from "primereact/avatar";
+import { useMemo } from "react";
 import { Button } from "primereact/button";
-import Link from "next/link";
 import { ElapsedTime } from "./ElapsedTime";
 import { useTheme } from "./ThemeProvider";
 
@@ -28,7 +25,7 @@ export default function LiveProfileCard({
   startTime,
   finishTime,
   timezone,
-  isLive,
+  // isLive,
   routeId,
   routeName,
   showSettings,
@@ -44,36 +41,36 @@ export default function LiveProfileCard({
   const textColor = theme === "dark" ? "text-gray-100" : "text-gray-900";
   const mutedColor = theme === "dark" ? "text-gray-400" : "text-gray-600";
 
-  const tzAbbr = useMemo(() => {
-    if (!timezone) return null;
-    try {
-      return (
-        new Intl.DateTimeFormat("en-US", {
-          timeZone: timezone,
-          timeZoneName: "short",
-        })
-          .formatToParts(new Date())
-          .find((p) => p.type === "timeZoneName")?.value ?? null
-      );
-    } catch {
-      return null;
-    }
-  }, [timezone]);
+  // const tzAbbr = useMemo(() => {
+  //   if (!timezone) return null;
+  //   try {
+  //     return (
+  //       new Intl.DateTimeFormat("en-US", {
+  //         timeZone: timezone,
+  //         timeZoneName: "short",
+  //       })
+  //         .formatToParts(new Date())
+  //         .find((p) => p.type === "timeZoneName")?.value ?? null
+  //     );
+  //   } catch {
+  //     return null;
+  //   }
+  // }, [timezone]);
 
   // Derive the effective display status:
   // - "upcoming" when startTime is still in the future
   // - "live" when isLive is true and start has passed
   // - "finished" when isLive is false
   // - undefined when isLive is not provided (no badge)
-  const effectiveStatus = useMemo(():
-    | "live"
-    | "upcoming"
-    | "finished"
-    | undefined => {
-    if (isLive === undefined) return undefined;
-    if (startTime && startTime > new Date()) return "upcoming";
-    return isLive ? "live" : "finished";
-  }, [isLive, startTime]);
+  // const effectiveStatus = useMemo(():
+  //   | "live"
+  //   | "upcoming"
+  //   | "finished"
+  //   | undefined => {
+  //   if (isLive === undefined) return undefined;
+  //   if (startTime && startTime > new Date()) return "upcoming";
+  //   return isLive ? "live" : "finished";
+  // }, [isLive, startTime]);
 
   const formattedStart = useMemo(() => {
     if (!startTime) return null;
@@ -125,10 +122,7 @@ export default function LiveProfileCard({
       )}
       <div className="flex items-start gap-3">
         {/* Profile Picture with LIVE badge */}
-        <Link
-          href={`/profile/${username}`}
-          className="relative flex-shrink-0 block"
-        >
+        <div className="relative flex-shrink-0 block">
           {profilePicture ? (
             <img
               src={profilePicture}
@@ -140,20 +134,18 @@ export default function LiveProfileCard({
               {username?.charAt(0).toUpperCase()}
             </div>
           )}
-        </Link>
+        </div>
 
         {/* Stream Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <Link href={`/profile/${username}`}>
-                  <h2
-                    className={`text-lg font-bold ${textColor} truncate hover:underline cursor-pointer`}
-                  >
-                    {username}
-                  </h2>
-                </Link>
+                <h2
+                  className={`text-lg font-bold ${textColor} truncate`}
+                >
+                  {username}
+                </h2>
                 {/* {effectiveStatus !== undefined && (
                   <span
                     className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${
@@ -176,13 +168,10 @@ export default function LiveProfileCard({
                 {streamTitle || "Live Stream"}
               </p>
               {routeId && (
-                <Link
-                  href={`/route/${routeId}?username=${username}`}
-                  className="inline-flex items-center gap-1 mt-1 text-sm text-blue-500 hover:text-blue-400 hover:underline"
-                >
+                <div className="inline-flex items-center gap-1 mt-1 text-sm text-blue-500">
                   <i className="pi pi-map text-xs" />
                   <span>{routeName || "View Route"}</span>
-                </Link>
+                </div>
               )}
             </div>
 

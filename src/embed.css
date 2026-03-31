@@ -4,13 +4,15 @@
    the host page's styles.
    ========================================================= */
 
-/* Tailwind utilities only – no preflight/base to avoid polluting the host page */
-@import "tailwindcss/utilities";
-
 /* PrimeReact Aura Dark theme */
 @import "primereact/resources/themes/lara-dark-blue/theme.css";
 @import "primereact/resources/primereact.min.css";
 @import "primeicons/primeicons.css";
+
+/* Tailwind directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 
 .ce-stream-page *,

@@ -5,6 +5,7 @@ export default defineConfig({
   plugins: [react()],
   define: {
     global: 'globalThis',
+    'process.env': {},
   },
   build: {
     target: "es2015",          // ensure compatibility

@@ -4,15 +4,15 @@ import type {
   LiveStream,
   ChatMessage,
   Waypoint,
-  Post,
+  // Post,
 } from "../generated/schema";
 import { appsyncRequest } from "../helpers/appsync.helper";
 import { appsyncSubscribe } from "../helpers/appsync-subscription.helper";
 import { STREAM_PROFILE_QUERY, ON_NEW_WAYPOINT } from "../helpers/queries";
 import { useUser } from "../context/useUser";
-import { ActivityChart } from "./ActivityChart";
+// import { ActivityChart } from "./ActivityChart";
 import { LoadingSkeleton } from "./LoadingSkeleton";
-import ProfileCard from "./ProfileCard";
+// import ProfileCard from "./ProfileCard";
 import LiveProfileCard from "./ProfileCard";
 import { getProfilePictureUrl } from "../utils/userImages";
 
@@ -30,7 +30,7 @@ export function StreamPage({ username, streamId }: StreamPageProps) {
   const [user, setUser] = useState<User | null>(null);
   const [stream, setStream] = useState<LiveStream | null>(null);
   const [waypoints, setWaypoints] = useState<Waypoint[]>([]);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [_chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -118,10 +118,10 @@ export function StreamPage({ username, streamId }: StreamPageProps) {
     );
   }
 
-  const trackerPosition =
-    waypoints.length > 0 ? waypoints[waypoints.length - 1] : undefined;
+  // const trackerPosition =
+  //   waypoints.length > 0 ? waypoints[waypoints.length - 1] : undefined;
 
-  const posts: Post[] = stream.posts?.filter((p): p is Post => p != null) ?? [];
+  // const posts: Post[] = stream.posts?.filter((p): p is Post => p != null) ?? [];
 
     if (
     !user.liveStreams ||
