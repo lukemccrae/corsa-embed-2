@@ -5,26 +5,36 @@ import App from "./App";
 /**
  * Auto-mount logic:
  *
- * Finds the <script> tag that loaded this bundle, reads
- * data-username and data-stream-id, creates a container div
- * immediately after the script tag, and mounts the React app.
+ * Finds the <script> tag that loaded this bundle, reads data attributes,
+ * creates a container div immediately after the script tag, and mounts
+ * the React app.
  *
- * Example embed snippet:
+ * Stream embed example:
  *   <script
  *     src="https://your-cdn/bundle.js"
  *     data-username="luke"
  *     data-stream-id="abc123"
  *   ></script>
+ *
+ * Route embed example:
+ *   <script
+ *     src="https://your-cdn/bundle.js"
+ *     data-username="luke"
+ *     data-route-id="route456"
+ *     data-view="route"
+ *   ></script>
  */
 function mount() {
   // Locate the script tag that loaded this bundle.
   // During initial execution `document.currentScript` is available.
-  // After the module is parsed we fall back to the last script tag.
+  // After the module is parsed we fall back to finding the last relevant tag.
   const scriptEl =
     (document.currentScript as HTMLScriptElement | null) ??
-    [...document.querySelectorAll<HTMLScriptElement>("script[data-username]")].at(
-      -1
-    );
+    [
+      ...document.querySelectorAll<HTMLScriptElement>(
+        "script[data-username]"
+      ),
+    ].at(-1);
 
   if (!scriptEl) {
     console.error("[CorsaEmbed] Could not locate the embedding <script> tag.");
@@ -33,11 +43,20 @@ function mount() {
 
   const username = scriptEl.dataset.username;
   const streamId = scriptEl.dataset.streamId;
+  const routeId = scriptEl.dataset.routeId;
+  const view = scriptEl.dataset.view as "stream" | "route" | undefined;
   const mountSelector = scriptEl.dataset.mount;
 
-  if (!username || !streamId) {
+  if (!username) {
     console.error(
-      "[CorsaEmbed] Missing data-username or data-stream-id attributes on the <script> tag."
+      "[CorsaEmbed] Missing data-username attribute on the <script> tag."
+    );
+    return;
+  }
+
+  if (!streamId && !routeId) {
+    console.error(
+      "[CorsaEmbed] Missing data-stream-id or data-route-id on the <script> tag."
     );
     return;
   }
@@ -55,14 +74,19 @@ function mount() {
     }
   } else {
     container = document.createElement("div");
-    container.id = `corsa-embed-${streamId}`;
+    container.id = `corsa-embed-${streamId ?? routeId}`;
     container.className = "corsa-embed-container";
     scriptEl.parentNode?.insertBefore(container, scriptEl.nextSibling);
   }
 
   createRoot(container).render(
     <React.StrictMode>
-      <App username={username} streamId={streamId} />
+      <App
+        username={username}
+        streamId={streamId}
+        routeId={routeId}
+        view={view}
+      />
     </React.StrictMode>
   );
 }
@@ -72,7 +96,9 @@ interface MountOptions {
   elementId?: string;
   container?: HTMLElement;
   username: string;
-  streamId: string;
+  streamId?: string;
+  routeId?: string;
+  view?: "stream" | "route";
 }
 
 function mountTo(options: MountOptions) {
@@ -87,7 +113,12 @@ function mountTo(options: MountOptions) {
 
   createRoot(el).render(
     <React.StrictMode>
-      <App username={options.username} streamId={options.streamId} />
+      <App
+        username={options.username}
+        streamId={options.streamId}
+        routeId={options.routeId}
+        view={options.view}
+      />
     </React.StrictMode>
   );
 }
@@ -99,4 +130,3 @@ function mountTo(options: MountOptions) {
 
 // Auto-mount when the script runs
 mount();
-

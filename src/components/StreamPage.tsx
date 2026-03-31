@@ -4,17 +4,20 @@ import type {
   LiveStream,
   ChatMessage,
   Waypoint,
-  // Post,
+  Post,
 } from "../generated/schema";
 import { appsyncRequest } from "../helpers/appsync.helper";
 import { appsyncSubscribe } from "../helpers/appsync-subscription.helper";
 import { STREAM_PROFILE_QUERY, ON_NEW_WAYPOINT } from "../helpers/queries";
 import { useUser } from "../context/useUser";
-// import { ActivityChart } from "./ActivityChart";
 import { LoadingSkeleton } from "./LoadingSkeleton";
-// import ProfileCard from "./ProfileCard";
 import LiveProfileCard from "./ProfileCard";
+import { CoverMap } from "./CoverMap";
+import { ProfileLiveChat } from "./ProfileLiveChat";
+import { FeedItem } from "./FeedItem";
+import { ElevationProfile } from "./ElevationProfile";
 import { getProfilePictureUrl } from "../utils/userImages";
+import { useTheme } from "./ThemeProvider";
 
 interface StreamPageProps {
   username: string;
@@ -27,14 +30,20 @@ interface StreamProfileResponse {
 
 export function StreamPage({ username, streamId }: StreamPageProps) {
   const { apiToken, isReady, error: authError } = useUser();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const [user, setUser] = useState<User | null>(null);
   const [stream, setStream] = useState<LiveStream | null>(null);
   const [waypoints, setWaypoints] = useState<Waypoint[]>([]);
-  const [_chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch user profile + stream data in one query once we have a token
+  const cardBg = isDark
+    ? "bg-gray-900/95 border-gray-700"
+    : "bg-white/95 border-gray-200";
+
+  // Fetch user profile + stream data once we have a token
   useEffect(() => {
     if (!isReady || !apiToken) return;
 
@@ -91,7 +100,7 @@ export function StreamPage({ username, streamId }: StreamPageProps) {
 
   if (authError) {
     return (
-      <div className="p-6 text-[#ef9a9a] bg-[#1a1a1a] rounded-lg text-center text-sm">
+      <div className="p-6 text-red-300 bg-gray-900 rounded-lg text-center text-sm">
         Auth error: {authError}
       </div>
     );
@@ -102,9 +111,8 @@ export function StreamPage({ username, streamId }: StreamPageProps) {
   }
 
   if (error) {
-    console.log("error loading stream data", error);
     return (
-      <div className="p-6 text-[#ef9a9a] bg-[#1a1a1a] rounded-lg text-center text-sm">
+      <div className="p-6 text-red-300 bg-gray-900 rounded-lg text-center text-sm">
         Error: {error}
       </div>
     );
@@ -112,18 +120,13 @@ export function StreamPage({ username, streamId }: StreamPageProps) {
 
   if (!user || !stream) {
     return (
-      <div className="p-6 text-[#ef9a9a] bg-[#1a1a1a] rounded-lg text-center text-sm">
+      <div className="p-6 text-red-300 bg-gray-900 rounded-lg text-center text-sm">
         Stream not found.
       </div>
     );
   }
 
-  // const trackerPosition =
-  //   waypoints.length > 0 ? waypoints[waypoints.length - 1] : undefined;
-
-  // const posts: Post[] = stream.posts?.filter((p): p is Post => p != null) ?? [];
-
-    if (
+  if (
     !user.liveStreams ||
     user.liveStreams.length === 0 ||
     !user.liveStreams[0]
@@ -133,9 +136,18 @@ export function StreamPage({ username, streamId }: StreamPageProps) {
 
   const startTime = new Date(user.liveStreams[0].startTime);
   const finishTime = user.liveStreams[0].finishTime ?? null;
-
-  // A stream is live when the backend live flag is set AND it hasn't finished yet.
   const isLive = !!(user.liveStreams[0].live && !finishTime);
+
+  // Filter out private waypoints for the map
+  const publicWaypoints = waypoints.filter((w) => !w.private);
+
+  const posts: Post[] =
+    stream.posts?.filter((p): p is Post => p != null) ?? [];
+
+  const hasMap = publicWaypoints.length > 0;
+
+  // Only show elevation section when waypoints have altitude readings
+  const waypointsWithAlt = publicWaypoints.filter((w) => w.altitude != null);
 
   return (
     <div className="ce-stream-page">
@@ -154,40 +166,78 @@ export function StreamPage({ username, streamId }: StreamPageProps) {
         routeName={stream.route?.name ?? null}
       />
 
-      {/* Map card */}
-      {waypoints.length > 0 && (
-        <div className="ce-section-card ce-map-panel">
-          <div className="ce-section-header">
-            <i className="pi pi-map ce-section-icon" />
-            <span className="ce-section-title">Route Map</span>
+      {/* Map + Chat side-by-side on md+ screens */}
+      {(hasMap || chatMessages.length > 0) && (
+        <div className="flex flex-col md:flex-row gap-3">
+          {/* Map */}
+          {hasMap && (
+            <div
+              className={`${cardBg} border rounded-lg shadow-lg overflow-hidden flex-1 min-w-0`}
+            >
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-700">
+                <i className="pi pi-map-marker text-red-500 text-sm" />
+                <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
+                  Route Map
+                </span>
+              </div>
+              <CoverMap
+                waypoints={publicWaypoints}
+                isLive={isLive}
+                height={320}
+              />
+            </div>
+          )}
+
+          {/* Chat */}
+          <div
+            className={`${cardBg} border rounded-lg shadow-lg overflow-hidden ${
+              hasMap ? "md:w-72 lg:w-80" : "w-full"
+            } flex flex-col`}
+            style={{ minHeight: 320, maxHeight: 400 }}
+          >
+            <ProfileLiveChat
+              initialMessages={chatMessages}
+              streamId={streamId}
+              apiToken={apiToken}
+              isLive={isLive}
+            />
           </div>
-          {/* <StreamMap
-            waypoints={waypoints}
-            trackerPosition={trackerPosition}
-            posts={posts}
-          /> */}
         </div>
       )}
 
-      {/* Activity chart card */}
-      {/* {waypoints.length > 1 && (
-        <div className="ce-section-card">
-          <ActivityChart waypoints={waypoints} />
+      {/* Elevation Profile */}
+      {waypointsWithAlt.length >= 2 && (
+        <div
+          className={`${cardBg} border rounded-lg shadow-lg overflow-hidden`}
+        >
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-700">
+            <i className="pi pi-chart-line text-red-500 text-sm" />
+            <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
+              Elevation Profile
+            </span>
+          </div>
+          <ElevationProfile waypoints={publicWaypoints} />
         </div>
-      )} */}
+      )}
 
-      {/* Live chat card */}
-      {/* {apiToken && (
-        <div className="ce-section-card">
-          <Chat
-            streamId={streamId}
-            initialMessages={chatMessages}
-            apiToken={apiToken}
-          />
+      {/* Feed / Posts */}
+      {posts.length > 0 && (
+        <div
+          className={`${cardBg} border rounded-lg shadow-lg overflow-hidden`}
+        >
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-700">
+            <i className="pi pi-list text-red-500 text-sm" />
+            <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
+              Updates
+            </span>
+          </div>
+          <div className="flex flex-col gap-3 p-4">
+            {posts.map((post, i) => (
+              <FeedItem key={`${post.createdAt}-${i}`} post={post} />
+            ))}
+          </div>
         </div>
-      )} */}
-
-      {/* Posts / feed card */}
+      )}
     </div>
   );
 }
