@@ -177,13 +177,14 @@ export function StreamPage({ username, streamId }: StreamPageProps) {
               <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-700">
                 <i className="pi pi-map-marker text-red-500 text-sm" />
                 <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
-                  Route Mappp
+                  Route Map
                 </span>
               </div>
               <CoverMap
                 waypoints={publicWaypoints}
                 isLive={isLive}
                 height={320}
+                posts={posts}
               />
             </div>
           )}

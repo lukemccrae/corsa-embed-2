@@ -26,7 +26,6 @@ export function FeedItem({ post }: FeedItemProps) {
   const cardBg = isDark
     ? "bg-gray-900/95 border-gray-700"
     : "bg-white/95 border-gray-200";
-  const textColor = isDark ? "text-gray-100" : "text-gray-900";
   const mutedColor = isDark ? "text-gray-400" : "text-gray-500";
   const bodyColor = isDark ? "text-gray-300" : "text-gray-700";
 
@@ -43,7 +42,7 @@ export function FeedItem({ post }: FeedItemProps) {
   const icon = postTypeIcon[post.type] ?? "pi-comment";
 
   return (
-    <div className={`${cardBg} border rounded-lg p-4 shadow-sm`}>
+    <div className={`${cardBg} border rounded-lg p-4 shadow-sm overflow-hidden`}>
       {/* Header */}
       <div className="flex items-center gap-2 mb-3">
         <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
@@ -76,15 +75,17 @@ export function FeedItem({ post }: FeedItemProps) {
 
       {/* Image */}
       {hasImage && statusPost.imagePath && (
-        <img
-          src={getPostImageUrl(statusPost.imagePath)}
-          alt="Post image"
-          className={`w-full rounded-lg object-cover max-h-64 ${textColor}`}
-          loading="lazy"
-          onError={(e) => {
-            (e.currentTarget as HTMLImageElement).style.display = "none";
-          }}
-        />
+        <div className="overflow-hidden rounded-lg mt-1 mb-2">
+          <img
+            src={getPostImageUrl(statusPost.imagePath)}
+            alt="Post image"
+            className="w-full block object-cover max-h-72 rounded-lg"
+            loading="lazy"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).style.display = "none";
+            }}
+          />
+        </div>
       )}
 
       {/* Location tag */}
