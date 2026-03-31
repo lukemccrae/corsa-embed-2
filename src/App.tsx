@@ -23,15 +23,17 @@ export default function App({ username, streamId, routeId, view }: AppProps) {
     <PrimeReactProvider>
       <ThemeProvider>
         <UserProvider>
-          {resolvedView === "route" && routeId ? (
-            <RoutePage username={username} routeId={routeId} />
-          ) : streamId ? (
-            <StreamPage username={username} streamId={streamId} />
-          ) : (
-            <div className="p-6 text-red-300 bg-gray-900 rounded-lg text-center text-sm">
-              Missing stream or route configuration.
-            </div>
-          )}
+          <div className="max-w-md mx-auto w-full">
+            {resolvedView === "route" && routeId ? (
+              <RoutePage username={username} routeId={routeId} />
+            ) : streamId ? (
+              <StreamPage username={username} streamId={streamId} />
+            ) : (
+              <div className="p-6 text-red-300 bg-gray-900 rounded-lg text-center text-sm">
+                Missing stream or route configuration.
+              </div>
+            )}
+          </div>
         </UserProvider>
       </ThemeProvider>
     </PrimeReactProvider>
