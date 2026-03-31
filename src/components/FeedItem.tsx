@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { Post, StatusPost } from "../generated/schema";
 import { getPostImageUrl } from "../utils/userImages";
 import { useTheme } from "./ThemeProvider";
@@ -22,6 +23,7 @@ function formatPostTime(iso: string): string {
 export function FeedItem({ post }: FeedItemProps) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const cardBg = isDark
     ? "bg-gray-900/95 border-gray-700"
@@ -32,6 +34,8 @@ export function FeedItem({ post }: FeedItemProps) {
   const statusPost = post as StatusPost;
   const hasImage = !!statusPost.imagePath;
   const hasText = !!statusPost.text;
+  const textLength = statusPost.text?.length ?? 0;
+  const isLongText = textLength > 200;
 
   const postTypeIcon: Record<string, string> = {
     STATUS: "pi-comment",
@@ -68,9 +72,19 @@ export function FeedItem({ post }: FeedItemProps) {
 
       {/* Body text */}
       {hasText && (
-        <p className={`text-sm ${bodyColor} leading-relaxed mb-3`}>
-          {statusPost.text}
-        </p>
+        <div className="mb-3">
+          <p className={`text-sm ${bodyColor} leading-relaxed ${!isExpanded && isLongText ? 'line-clamp-3' : ''}`}>
+            {statusPost.text}
+          </p>
+          {isLongText && (
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className={`text-xs ${mutedColor} hover:text-red-400 mt-1 font-medium transition-colors`}
+            >
+              {isExpanded ? "Show less" : "Read more"}
+            </button>
+          )}
+        </div>
       )}
 
       {/* Image */}
