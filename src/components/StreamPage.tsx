@@ -191,9 +191,7 @@ export function StreamPage({ username, streamId }: StreamPageProps) {
 
           {/* Chat */}
           <div
-            className={`${cardBg} border rounded-lg shadow-lg overflow-hidden ${
-              hasMap ? "md:w-72 lg:w-80" : "w-full"
-            } flex flex-col`}
+            className={`${cardBg} border rounded-lg shadow-lg overflow-hidden w-full flex flex-col`}
             style={{ minHeight: 320, maxHeight: 400 }}
           >
             <ProfileLiveChat
