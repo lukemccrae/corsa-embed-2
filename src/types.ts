@@ -31,6 +31,8 @@ export interface CorsaWindow extends Window {
   __CORSA_EMBED_CONFIG__?: {
     firebase?: FirebaseConfig;
     domain?: DomainConfig;
+    /** Maximum height (px) of the feed/posts scroll region. Default: 600 */
+    feedMaxHeight?: number;
   };
 }
 

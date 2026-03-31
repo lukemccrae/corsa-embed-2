@@ -13,9 +13,11 @@ interface AppProps {
   routeId?: string;
   /** "stream" (default) | "route" */
   view?: "stream" | "route";
+  /** Maximum height (px) for the feed/posts scroll area. Default: 600 */
+  feedMaxHeight?: number;
 }
 
-export default function App({ username, streamId, routeId, view }: AppProps) {
+export default function App({ username, streamId, routeId, view, feedMaxHeight }: AppProps) {
   const resolvedView: "stream" | "route" =
     view === "route" || (!streamId && routeId) ? "route" : "stream";
 
@@ -27,7 +29,7 @@ export default function App({ username, streamId, routeId, view }: AppProps) {
             {resolvedView === "route" && routeId ? (
               <RoutePage username={username} routeId={routeId} />
             ) : streamId ? (
-              <StreamPage username={username} streamId={streamId} />
+              <StreamPage username={username} streamId={streamId} feedMaxHeight={feedMaxHeight} />
             ) : (
               <div className="p-6 text-red-300 bg-gray-900 rounded-lg text-center text-sm">
                 Missing stream or route configuration.

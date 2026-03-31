@@ -22,13 +22,15 @@ import { useTheme } from "./ThemeProvider";
 interface StreamPageProps {
   username: string;
   streamId: string;
+  /** Maximum height (px) of the feed/posts scroll area. Default: 600 */
+  feedMaxHeight?: number;
 }
 
 interface StreamProfileResponse {
   getUserByUserName: User;
 }
 
-export function StreamPage({ username, streamId }: StreamPageProps) {
+export function StreamPage({ username, streamId, feedMaxHeight = 600 }: StreamPageProps) {
   const { apiToken, isReady, error: authError } = useUser();
   const { theme } = useTheme();
   const isDark = theme === "dark";
@@ -230,7 +232,10 @@ export function StreamPage({ username, streamId }: StreamPageProps) {
               Updates
             </span>
           </div>
-          <div className="flex flex-col gap-3 p-4">
+          <div
+            className="ce-feed-scroll flex flex-col gap-3 p-4"
+            style={{ maxHeight: feedMaxHeight, overflowY: "auto", overscrollBehavior: "contain" }}
+          >
             {posts.map((post, i) => (
               <FeedItem key={`${post.createdAt}-${i}`} post={post} />
             ))}

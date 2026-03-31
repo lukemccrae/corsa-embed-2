@@ -47,6 +47,13 @@ function mount() {
   const view = scriptEl.dataset.view as "stream" | "route" | undefined;
   const mountSelector = scriptEl.dataset.mount;
 
+  // Resolve feedMaxHeight: data-max-height attr > window config > default (600)
+  const runtimeConfig = (window as Window & { __CORSA_EMBED_CONFIG__?: { feedMaxHeight?: number } }).__CORSA_EMBED_CONFIG__;
+  const feedMaxHeight =
+    scriptEl.dataset.maxHeight !== undefined
+      ? Number(scriptEl.dataset.maxHeight)
+      : runtimeConfig?.feedMaxHeight ?? 600;
+
   if (!username) {
     console.error(
       "[CorsaEmbed] Missing data-username attribute on the <script> tag."
@@ -86,6 +93,7 @@ function mount() {
         streamId={streamId}
         routeId={routeId}
         view={view}
+        feedMaxHeight={feedMaxHeight}
       />
     </React.StrictMode>
   );
@@ -99,6 +107,7 @@ interface MountOptions {
   streamId?: string;
   routeId?: string;
   view?: "stream" | "route";
+  feedMaxHeight?: number;
 }
 
 function mountTo(options: MountOptions) {
@@ -118,6 +127,7 @@ function mountTo(options: MountOptions) {
         streamId={options.streamId}
         routeId={options.routeId}
         view={options.view}
+        feedMaxHeight={options.feedMaxHeight}
       />
     </React.StrictMode>
   );

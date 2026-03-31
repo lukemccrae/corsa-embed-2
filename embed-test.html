@@ -38,7 +38,8 @@
             appsyncEndpoint: "https://...",
             appsyncRealtimeEndpoint: "wss://...",
             cdnBase: "https://..."
-          }
+          },
+          feedMaxHeight: 600
         };
       </script>
       */
@@ -58,11 +59,17 @@
       EMBED SNIPPET — copy this into any host page.
       Replace data-username and data-stream-id with real values before testing.
       The bundle will auto-mount a container div immediately after this tag.
+
+      Optional attributes:
+        data-max-height  — max height (px) of the posts/feed scroll region.
+                           Default is 600. Set to a larger value or omit to
+                           adjust how tall the feed can grow before scrolling.
     -->
     <script
       src="./dist-singlefile/bundle.js"
       data-username="lukemccrae"
       data-stream-id="REPLACE_WITH_REAL_STREAM_ID"
+      data-max-height="600"
     ></script>
 
     <hr style="border-color:#333; margin: 24px 0;" />
