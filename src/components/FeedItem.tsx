@@ -75,11 +75,11 @@ export function FeedItem({ post }: FeedItemProps) {
 
       {/* Image */}
       {hasImage && statusPost.imagePath && (
-        <div className="overflow-hidden rounded-lg mt-1 mb-2">
+        <div className="overflow-hidden rounded-lg mt-1 mb-2 bg-black/10">
           <img
             src={getPostImageUrl(statusPost.imagePath)}
             alt="Post image"
-            className="w-full block object-cover max-h-72 rounded-lg"
+            className="w-full block object-contain max-h-96 rounded-lg"
             loading="lazy"
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).style.display = "none";
