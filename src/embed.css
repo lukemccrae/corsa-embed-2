@@ -275,6 +275,32 @@
   color: #e53935;
 }
 
+/* ---- Waypoint popup ---- */
+.ce-wp-popup {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  min-width: 110px;
+}
+
+.ce-wp-popup-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 2px 0;
+}
+
+.ce-wp-popup-label {
+  font-size: 11px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ce-wp-popup-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: #111;
+}
+
 /* ---- Activity Chart ---- */
 .ce-activity-chart {
   padding: 0;

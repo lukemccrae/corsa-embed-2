@@ -164,6 +164,44 @@ export function CoverMap({
             />
           )}
 
+          {/* Waypoint dot markers (all waypoints, with popup details) */}
+          {waypoints.map((w, idx) => (
+            <CircleMarker
+              key={`wp-dot-${idx}`}
+              center={[w.lat, w.lng]}
+              radius={4}
+              pathOptions={{
+                color: "#fff",
+                fillColor: "#ef4444",
+                fillOpacity: 1,
+                weight: 1.5,
+              }}
+            >
+              <Popup>
+                <div className="ce-wp-popup">
+                  {w.mileMarker != null && (
+                    <div className="ce-wp-popup-row">
+                      <span className="ce-wp-popup-label">Mile</span>
+                      <span className="ce-wp-popup-value">{w.mileMarker.toFixed(1)}</span>
+                    </div>
+                  )}
+                  {w.altitude != null && (
+                    <div className="ce-wp-popup-row">
+                      <span className="ce-wp-popup-label">Altitude</span>
+                      <span className="ce-wp-popup-value">{Math.round(w.altitude)} ft</span>
+                    </div>
+                  )}
+                  <div className="ce-wp-popup-row">
+                    <span className="ce-wp-popup-label">Time</span>
+                    <span className="ce-wp-popup-value">
+                      {new Date(w.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                    </span>
+                  </div>
+                </div>
+              </Popup>
+            </CircleMarker>
+          ))}
+
           {/* Live tracker dot at current position */}
           {trackerPos && isLive && (
             <CircleMarker
