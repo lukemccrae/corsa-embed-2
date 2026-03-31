@@ -13,7 +13,7 @@ import { useUser } from "../context/useUser";
 import { LoadingSkeleton } from "./LoadingSkeleton";
 import LiveProfileCard from "./ProfileCard";
 import { CoverMap } from "./CoverMap";
-import { ProfileLiveChat } from "./ProfileLiveChat";
+// import { ProfileLiveChat } from "./ProfileLiveChat";
 import { FeedItem } from "./FeedItem";
 import { ElevationProfile } from "./ElevationProfile";
 import { getProfilePictureUrl } from "../utils/userImages";
@@ -190,7 +190,7 @@ export function StreamPage({ username, streamId }: StreamPageProps) {
           )}
 
           {/* Chat */}
-          <div
+          {/* <div
             className={`${cardBg} border rounded-lg shadow-lg overflow-hidden w-full flex flex-col`}
             style={{ minHeight: 320, maxHeight: 400 }}
           >
@@ -200,7 +200,7 @@ export function StreamPage({ username, streamId }: StreamPageProps) {
               apiToken={apiToken}
               isLive={isLive}
             />
-          </div>
+          </div> */}
         </div>
       )}
 
