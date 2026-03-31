@@ -168,7 +168,7 @@ export function StreamPage({ username, streamId }: StreamPageProps) {
 
       {/* Map + Chat side-by-side on md+ screens */}
       {(hasMap || chatMessages.length > 0) && (
-        <div className="flex flex-col md:flex-row gap-3">
+        <div className="flex flex-col gap-3">
           {/* Map */}
           {hasMap && (
             <div
