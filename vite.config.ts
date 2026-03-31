@@ -1,36 +1,23 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import tailwindcss from "@tailwindcss/vite";
-import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js";
 
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    tailwindcss(),
-    react(),
-    // Inline all CSS into the JS bundle so there is only one file to host
-    cssInjectedByJsPlugin(),
-  ],
+  plugins: [react()],
+  define: {
+    global: 'globalThis',
+  },
   build: {
+    target: "es2015",          // ensure compatibility
     outDir: "dist-singlefile",
-    assetsInlineLimit: 100_000_000, // inline all assets (images, fonts)
-    cssCodeSplit: false,
+    assetsInlineLimit: 1000000, // inline big assets
     rollupOptions: {
-      input: "src/main.tsx",
+      input: "index.html",      // entry HTML
       output: {
-        format: "iife",
-        entryFileNames: "bundle.js",
-        chunkFileNames: "bundle.js",
-        assetFileNames: "bundle.[ext]",
-        inlineDynamicImports: true,
-        // Expose global so host pages can call CorsaEmbed.mount(...)
-        name: "CorsaEmbed",
+        format: "iife",         // single-file IIFE
+        entryFileNames: "bundle.js", // fixed name
+        inlineDynamicImports: true,  // include all chunks
+        assetFileNames: "[name].[ext]", 
       },
     },
-    // Produce one minified JS file
-    minify: true,
-    // Suppress expected size warning for a single-file bundle
-    chunkSizeWarningLimit: 2000,
   },
 });
-
