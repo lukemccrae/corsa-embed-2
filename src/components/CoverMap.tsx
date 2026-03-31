@@ -113,14 +113,16 @@ export function CoverMap({
       });
   }, [posts]);
 
-  // Build custom DivIcons for post markers (text-only = blue, image = red)
-  const makePostIcon = (hasImage: boolean) =>
+  // Build custom DivIcons for post markers (text-only = blue, image = photo thumbnail)
+  const makePostIcon = (imageUrl: string | null) =>
     L.divIcon({
       className: "",
-      html: `<div class="ce-post-marker${hasImage ? " ce-post-marker--image" : ""}"><i class="pi ${hasImage ? "pi-image" : "pi-comment"}"></i></div>`,
-      iconSize: [28, 28],
-      iconAnchor: [14, 14],
-      popupAnchor: [0, -16],
+      html: imageUrl
+        ? `<div class="ce-post-marker ce-post-marker--image" style="background-image: url('${imageUrl}'); background-size: cover; background-position: center; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>`
+        : `<div class="ce-post-marker"><i class="pi pi-comment"></i></div>`,
+      iconSize: [48, 48],
+      iconAnchor: [24, 24],
+      popupAnchor: [0, -24  ],
     });
 
   return (
@@ -213,7 +215,7 @@ export function CoverMap({
               <Marker
                 key={`post-${post.createdAt}-${idx}`}
                 position={position}
-                icon={makePostIcon(hasImage)}
+                icon={makePostIcon(imageUrl)}
               >
                 <Popup>
                   <div style={{ maxWidth: 220, fontFamily: "sans-serif" }}>
