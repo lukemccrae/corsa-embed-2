@@ -116,3 +116,25 @@ export const ON_NEW_WAYPOINT = /* GraphQL */ `
     }
   }
 `;
+
+/**
+ * Fetches route metadata for a given user, used by the route embed.
+ * Pass the routeId to filter the desired route on the client side.
+ */
+export const ROUTE_QUERY = (username: string) => /* GraphQL */ `
+  query GetUserRoutes {
+    getUserByUserName(username: "${username}") {
+      username
+      profilePicture
+      routes {
+        routeId
+        name
+        storagePath
+        overlayPath
+        distanceInMiles
+        gainInFeet
+        uom
+      }
+    }
+  }
+`;
