@@ -46,7 +46,7 @@ export function FeedItem({ post }: FeedItemProps) {
   const icon = postTypeIcon[post.type] ?? "pi-comment";
 
   return (
-    <div className={`${cardBg} border rounded-lg p-4 shadow-sm overflow-hidden`}>
+    <div className={`${cardBg} border rounded-lg p-4 shadow-sm`}>
       {/* Header */}
       <div className="flex items-center gap-2 mb-3">
         <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
