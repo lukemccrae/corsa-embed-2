@@ -38,13 +38,13 @@ export function FeedItem({ post, user }: FeedItemProps) {
   const textLength = statusPost.text?.length ?? 0;
   const isLongText = textLength > 200;
 
-  const postTypeIcon: Record<string, string> = {
-    STATUS: "pi-comment",
-    PHOTO: "pi-image",
-    BLOG: "pi-file",
-    LIVESTREAM: "pi-video",
-  };
-  const icon = postTypeIcon[post.type] ?? "pi-comment";
+  // const postTypeIcon: Record<string, string> = {
+  //   STATUS: "pi-comment",
+  //   PHOTO: "pi-image",
+  //   BLOG: "pi-file",
+  //   LIVESTREAM: "pi-video",
+  // };
+  // const icon = postTypeIcon[post.type] ?? "pi-comment";
 
   return (
     <div className={`${cardBg} border rounded-lg p-4 shadow-sm`}>
