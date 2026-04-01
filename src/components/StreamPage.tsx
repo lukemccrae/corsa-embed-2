@@ -229,9 +229,9 @@ export function StreamPage({ username, streamId, feedMaxHeight = 600 }: StreamPa
           className={`${cardBg} border rounded-lg shadow-lg overflow-hidden`}
         >
           <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-700">
-            <i className="pi pi-list text-red-500 text-sm" />
+            <i className="pi pi-book text-red-500 text-sm" />
             <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
-              Updates
+              Posts
             </span>
           </div>
           <div
