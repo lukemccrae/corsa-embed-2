@@ -144,7 +144,9 @@ export function StreamPage({ username, streamId, feedMaxHeight = 600 }: StreamPa
   const publicWaypoints = waypoints.filter((w) => !w.private);
 
   const posts: Post[] =
-    stream.posts?.filter((p): p is Post => p != null) ?? [];
+    stream.posts?.filter((p): p is Post => p != null).sort((a, b) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    ) ?? [];
 
   const hasMap = publicWaypoints.length > 0;
 

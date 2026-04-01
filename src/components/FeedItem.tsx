@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Post, StatusPost } from "../generated/schema";
+import type { Post, StatusPost, User } from "../generated/schema";
 import { getPostImageUrl, getProfilePictureUrl } from "../utils/userImages";
 import { useTheme } from "./ThemeProvider";
 
