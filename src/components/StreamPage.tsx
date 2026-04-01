@@ -237,7 +237,7 @@ export function StreamPage({ username, streamId, feedMaxHeight = 600 }: StreamPa
             style={{ maxHeight: feedMaxHeight, overflowY: "auto", overscrollBehavior: "contain" }}
           >
             {posts.map((post, i) => (
-              <FeedItem key={`${post.createdAt}-${i}`} post={post} />
+              <FeedItem key={`${post.createdAt}-${i}`} post={post} user={user} />
             ))}
           </div>
         </div>

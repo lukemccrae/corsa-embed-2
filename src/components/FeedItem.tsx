@@ -1,10 +1,11 @@
 import { useState } from "react";
 import type { Post, StatusPost } from "../generated/schema";
-import { getPostImageUrl } from "../utils/userImages";
+import { getPostImageUrl, getProfilePictureUrl } from "../utils/userImages";
 import { useTheme } from "./ThemeProvider";
 
 interface FeedItemProps {
   post: Post;
+  user: User;
 }
 
 function formatPostTime(iso: string): string {
@@ -20,7 +21,7 @@ function formatPostTime(iso: string): string {
   }
 }
 
-export function FeedItem({ post }: FeedItemProps) {
+export function FeedItem({ post, user }: FeedItemProps) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const [isExpanded, setIsExpanded] = useState(false);
@@ -50,11 +51,17 @@ export function FeedItem({ post }: FeedItemProps) {
       {/* Header */}
       <div className="flex items-center gap-2 mb-3">
         <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
-          <i className={`pi ${icon} text-sm text-red-400`} />
+          {/* <i className={`pi ${icon} text-sm text-red-400`} /> */}
+          {/* user profile picture icon */}
+          <img
+            src={getProfilePictureUrl({ profilePicture: user.profilePicture })}
+            alt={`${user.username}'s profile`}
+            className="w-8 h-8 rounded-full object-cover"
+          />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className={`text-xs font-semibold uppercase tracking-wide ${mutedColor}`}>
+            {/* <span className={`text-xs font-semibold uppercase tracking-wide ${mutedColor}`}>
               {post.type === "STATUS"
                 ? "Update"
                 : post.type === "PHOTO"
@@ -62,7 +69,7 @@ export function FeedItem({ post }: FeedItemProps) {
                 : post.type === "BLOG"
                 ? "Note"
                 : "Post"}
-            </span>
+            </span> */}
             <span className={`text-xs ${mutedColor}`}>
               {formatPostTime(post.createdAt)}
             </span>
