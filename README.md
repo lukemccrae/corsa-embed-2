@@ -60,6 +60,10 @@ All TypeScript types are sourced from `src/generated/schema.ts` (generated via G
 ## Map Features
 
 - The route polyline is rendered in red on top of an OpenStreetMap tile layer.
+- **Waypoint dot markers** appear on the map at every recorded waypoint along the route.
+  - Each dot is a small red circle with a white border.
+  - Clicking a dot opens a popup showing the **mile marker** (if available), **altitude** (if available), and the **recorded time** for that waypoint.
+  - Markers use `CircleMarker` (SVG-based) so no external icon assets are required; the embed remains fully self-contained.
 - **Post markers** appear on the map at each post's GPS location:
   - Blue circle icon for text-only posts.
   - Red circle icon for posts with images.
