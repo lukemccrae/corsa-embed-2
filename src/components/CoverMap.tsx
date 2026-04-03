@@ -73,7 +73,7 @@ export function CoverMap({
 
   const routePositions = useMemo<[number, number][]>(
     () =>
-      routeGeoJson
+      routeGeoJson?.coordinates
         ? routeGeoJson.coordinates.map(([lng, lat]) => [lat, lng])
         : [],
     [routeGeoJson],
