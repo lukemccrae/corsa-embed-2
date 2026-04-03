@@ -116,6 +116,17 @@ export function CoverMap({
       ? routePositions
       : postPositions;
 
+  // Debug logging
+  console.log('[CoverMap] Debug:', {
+    postsCount: posts.length,
+    locatedPostsCount: locatedPosts.length,
+    postPositionsCount: postPositions.length,
+    waypointPositionsCount: waypointPositions.length,
+    routePositionsCount: routePositions.length,
+    allPositionsCount: allPositions.length,
+    allPositions: allPositions.slice(0, 2), // First 2 positions for inspection
+  });
+
   // Build custom DivIcons for post markers (text-only = blue, image = photo thumbnail)
   const makePostIcon = (imageUrl: string | null) =>
     L.divIcon({

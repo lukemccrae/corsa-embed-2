@@ -153,6 +153,15 @@ export function StreamPage({ username, streamId, feedMaxHeight = 600 }: StreamPa
   );
   const hasMap = publicWaypoints.length > 0 || hasPostsWithLocation;
 
+  // Debug logging
+  console.log('[StreamPage] Debug:', {
+    postsCount: posts.length,
+    postsWithLocation: posts.filter((p) => p.location?.lat != null && p.location?.lng != null).length,
+    hasPostsWithLocation,
+    publicWaypointsCount: publicWaypoints.length,
+    hasMap,
+  });
+
   // Only show elevation section when waypoints have altitude readings
   const waypointsWithAlt = publicWaypoints.filter((w) => w.altitude != null);
 
@@ -184,7 +193,7 @@ export function StreamPage({ username, streamId, feedMaxHeight = 600 }: StreamPa
               <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-700">
                 <i className="pi pi-map-marker text-red-500 text-sm" />
                 <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
-                  Route Map
+                  Route Mapeee
                 </span>
               </div>
               <CoverMap

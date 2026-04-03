@@ -212,7 +212,7 @@ export function RoutePage({ username, routeId }: RoutePageProps) {
           <div className="flex items-center gap-2 px-4 py-3">
             <i className="pi pi-map-marker text-red-500 text-sm" />
             <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
-              Route Map
+              Route Mapppp
             </span>
           </div>
           {geoLoading ? (
