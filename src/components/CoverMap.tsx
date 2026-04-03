@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -109,35 +109,35 @@ export function CoverMap({
       });
   }, [posts]);
 
-  const postPositions = locatedPosts.map(({ position }) => position);
-  const allPositions = waypointPositions.length
-    ? waypointPositions
-    : routePositions.length
-      ? routePositions
-      : postPositions;
+  const postPositions = useMemo<[number, number][]>(
+    () => locatedPosts.map(({ position }) => position),
+    [locatedPosts],
+  );
 
-  // Debug logging
-  console.log('[CoverMap] Debug:', {
-    postsCount: posts.length,
-    locatedPostsCount: locatedPosts.length,
-    postPositionsCount: postPositions.length,
-    waypointPositionsCount: waypointPositions.length,
-    routePositionsCount: routePositions.length,
-    allPositionsCount: allPositions.length,
-    allPositions: allPositions.slice(0, 2), // First 2 positions for inspection
-  });
+  const allPositions = useMemo<[number, number][]>(
+    () =>
+      waypointPositions.length
+        ? waypointPositions
+        : routePositions.length
+          ? routePositions
+          : postPositions,
+    [waypointPositions, routePositions, postPositions],
+  );
 
   // Build custom DivIcons for post markers (text-only = blue, image = photo thumbnail)
-  const makePostIcon = (imageUrl: string | null) =>
-    L.divIcon({
-      className: "",
-      html: imageUrl
-        ? `<div class="ce-post-marker ce-post-marker--image" style="background-image: url('${imageUrl}'); background-size: cover; background-position: center; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>`
-        : `<div class="ce-post-marker"><i class="pi pi-comment"></i></div>`,
-      iconSize: [48, 48],
-      iconAnchor: [24, 24],
-      popupAnchor: [0, -24  ],
-    });
+  const makePostIcon = useCallback(
+    (imageUrl: string | null) =>
+      L.divIcon({
+        className: "",
+        html: imageUrl
+          ? `<div class="ce-post-marker ce-post-marker--image" style="background-image: url('${imageUrl}'); background-size: cover; background-position: center; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>`
+          : `<div class="ce-post-marker"><i class="pi pi-comment"></i></div>`,
+        iconSize: [48, 48],
+        iconAnchor: [24, 24],
+        popupAnchor: [0, -24],
+      }),
+    [],
+  );
 
   return (
     <>
