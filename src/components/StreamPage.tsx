@@ -148,7 +148,10 @@ export function StreamPage({ username, streamId, feedMaxHeight = 600 }: StreamPa
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     ) ?? [];
 
-  const hasMap = publicWaypoints.length > 0;
+  const hasPostsWithLocation = posts.some(
+    (p) => p.location?.lat != null && p.location?.lng != null,
+  );
+  const hasMap = publicWaypoints.length > 0 || hasPostsWithLocation;
 
   // Only show elevation section when waypoints have altitude readings
   const waypointsWithAlt = publicWaypoints.filter((w) => w.altitude != null);

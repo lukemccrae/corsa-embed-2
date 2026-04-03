@@ -87,10 +87,6 @@ export function CoverMap({
   // Default center when nothing is loaded yet
   const defaultCenter: [number, number] = [37.77, -122.42];
 
-  const allPositions = waypointPositions.length
-    ? waypointPositions
-    : routePositions;
-
   // Posts with GPS coordinates – spread overlapping pins by a tiny offset
   // JITTER_DEGREES is ~9 m per overlapping post, enough to visually separate pins
   const JITTER_DEGREES = 0.00008;
@@ -112,6 +108,13 @@ export function CoverMap({
         };
       });
   }, [posts]);
+
+  const postPositions = locatedPosts.map(({ position }) => position);
+  const allPositions = waypointPositions.length
+    ? waypointPositions
+    : routePositions.length
+      ? routePositions
+      : postPositions;
 
   // Build custom DivIcons for post markers (text-only = blue, image = photo thumbnail)
   const makePostIcon = (imageUrl: string | null) =>
