@@ -151,7 +151,8 @@ export function StreamPage({ username, streamId, feedMaxHeight = 600 }: StreamPa
   const hasPostsWithLocation = posts.some(
     (p) => p.location?.lat != null && p.location?.lng != null,
   );
-  const hasMap = publicWaypoints.length > 0 || hasPostsWithLocation;
+  const currentLocation = stream.currentLocation ?? null;
+  const hasMap = publicWaypoints.length > 0 || hasPostsWithLocation || !!currentLocation;
 
   // Only show elevation section when waypoints have altitude readings
   const waypointsWithAlt = publicWaypoints.filter((w) => w.altitude != null);
@@ -192,6 +193,7 @@ export function StreamPage({ username, streamId, feedMaxHeight = 600 }: StreamPa
                 isLive={isLive}
                 height={320}
                 posts={posts}
+                currentLocation={currentLocation}
               />
             </div>
           )}
