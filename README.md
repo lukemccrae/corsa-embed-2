@@ -43,15 +43,44 @@ All TypeScript types are sourced from `src/generated/schema.ts` (generated via G
 
 ## Embedding
 
+### Minimal single-tag embed (recommended)
+
+Copy this one `<script>` tag into any host page — no extra `<div>`, no config block needed.
+The bundle auto-creates its own container and mounts immediately after the tag.
+
 ```html
+<script
+  src="https://your-cdn/bundle.js"
+  data-username="alice"
+  data-stream-id="stream-123"
+></script>
+```
+
+#### Available data attributes
+
+| Attribute | Required | Default | Description |
+|---|---|---|---|
+| `data-username` | ✅ | — | CORSA username to embed |
+| `data-stream-id` | ✅ (stream) | — | Stream ID for stream embed |
+| `data-route-id` | ✅ (route) | — | Route ID for route embed |
+| `data-view` | ❌ | `"stream"` | `"stream"` or `"route"` |
+| `data-max-height` | ❌ | `600` | Max height (px) of the feed scroll area |
+| `data-mount` | ❌ | auto | CSS selector of an existing element to mount into. When omitted the bundle auto-creates a `<div>` immediately after the script tag. |
+
+### Manual mount via JS API
+
+You can also target an existing element programmatically:
+
+```html
+<div id="corsa-stream-widget"></div>
+<script src="https://your-cdn/bundle.js"></script>
 <script>
-  window.__CORSA_EMBED_CONFIG__ = {
-    firebase: { apiKey: "...", authDomain: "...", ... },
-    domain: { appsyncEndpoint: "...", appsyncRealtimeEndpoint: "...", cdnBase: "..." }
-  };
+  CorsaEmbed.mount({
+    elementId: "corsa-stream-widget",
+    username: "alice",
+    streamId: "stream-123"
+  });
 </script>
-<script src="bundle.js"></script>
-<script>CorsaEmbed.mount(document.getElementById("embed"), { username: "alice", streamId: "stream-123" });</script>
 ```
 
 > **No additional CSS files needed.** PrimeReact (lara-dark-blue theme), PrimeIcons, and Tailwind

@@ -6,14 +6,21 @@
   </head>
   <body>
     <div id="corsa-embed"></div>
-    <script type="module" src="/src/main.tsx"></script>
+
+    <!--
+      Dev-mode data-attribute script: provides username/stream config for
+      the auto-mount fallback (document.currentScript is null for ES modules,
+      so main.tsx falls back to querySelectorAll("script[data-username]")).
+      This tag has no src — it is never executed by the browser.
+    -->
     <script
-      src="https://d2ugbf2pkr6nwe.cloudfront.net/corsa-bundle.js"
       data-username="lukemccrae"
       data-stream-id="1301bfd5-b354-4d46-a496-da51261600af"
       data-mount="#corsa-embed"
-      defer
     ></script>
+
+    <!-- Dev entry: Vite HMR module (never included in the embed bundle) -->
+    <script type="module" src="/src/main.tsx"></script>
 
     <script>
       window.__CORSA_EMBED_CONFIG__ = {
