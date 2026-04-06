@@ -226,12 +226,6 @@ export function RoutePage({ username, routeId, components = {} }: RoutePageProps
           {/* Map */}
           {showMap && (
             <div className="border-b border-gray-700">
-              <div className="flex items-center gap-2 px-4 py-3">
-                <i className="pi pi-map-marker text-red-500 text-sm" />
-                <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
-                  Route Mapppp
-                </span>
-              </div>
               {geoLoading ? (
                 <div className="flex items-center justify-center h-64 text-gray-500 text-sm">
                   Loading map…
@@ -245,12 +239,6 @@ export function RoutePage({ username, routeId, components = {} }: RoutePageProps
           {/* Elevation Profile */}
           {altitudeProfile.length >= 2 && showElevation && (
             <div>
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-700">
-                <i className="pi pi-chart-line text-red-500 text-sm" />
-                <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
-                  Elevation Profile
-                </span>
-              </div>
               <ElevationProfile
                 waypoints={[]}
                 altitudeProfile={altitudeProfile}

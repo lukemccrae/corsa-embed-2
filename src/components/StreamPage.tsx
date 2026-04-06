@@ -207,12 +207,6 @@ export function StreamPage({ username, streamId, feedMaxHeight = 600, components
               <div
                 className={`${cardBg} border rounded-lg shadow-lg overflow-hidden`}
               >
-                <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-700">
-                  <i className="pi pi-map-marker text-red-500 text-sm" />
-                  <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
-                    Route Map
-                  </span>
-                </div>
                 <CoverMap
                   waypoints={publicWaypoints}
                   isLive={isLive}
@@ -227,12 +221,6 @@ export function StreamPage({ username, streamId, feedMaxHeight = 600, components
               <div
                 className={`${cardBg} border rounded-lg shadow-lg overflow-hidden`}
               >
-                <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-700">
-                  <i className="pi pi-chart-line text-red-500 text-sm" />
-                  <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
-                    Elevation Profile
-                  </span>
-                </div>
                 <ElevationProfile waypoints={publicWaypoints} />
               </div>
             )}
@@ -245,12 +233,6 @@ export function StreamPage({ username, streamId, feedMaxHeight = 600, components
             <div
               className={`${cardBg} border rounded-lg shadow-lg overflow-hidden`}
             >
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-700">
-                <i className="pi pi-book text-red-500 text-sm" />
-                <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
-                  Posts
-                </span>
-              </div>
               <div
                 className="ce-feed-scroll flex flex-col gap-3 p-4"
                 style={{ maxHeight: feedMaxHeight, overflowY: "auto", overscrollBehavior: "contain" }}
