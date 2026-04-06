@@ -1,4 +1,4 @@
-import { domainConfig } from "../context/DomainContext";
+import { defaultConfig } from "../config";
 
 export interface GraphQLResponse<T> {
   data?: T;
@@ -12,9 +12,9 @@ export interface GraphQLResponse<T> {
 export async function appsyncRequest<T = unknown>(
   query: string,
   variables: Record<string, unknown>,
-  token: string
+  token: string,
 ): Promise<T> {
-  const res = await fetch(domainConfig.appsyncEndpoint, {
+  const res = await fetch(defaultConfig.domain.appsyncEndpoint, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
