@@ -48,11 +48,23 @@ function mount() {
   const mountSelector = scriptEl.dataset.mount;
 
   // Resolve feedMaxHeight: data-max-height attr > window config > default (600)
-  const runtimeConfig = (window as Window & { __CORSA_EMBED_CONFIG__?: { feedMaxHeight?: number } }).__CORSA_EMBED_CONFIG__;
+  const runtimeConfig = (window as Window & { __CORSA_EMBED_CONFIG__?: { 
+    feedMaxHeight?: number;
+    components?: {
+      map?: boolean;
+      posts?: boolean;
+      elevation?: boolean;
+      route?: boolean;
+      profile?: boolean;
+    };
+  } }).__CORSA_EMBED_CONFIG__;
   const feedMaxHeight =
     scriptEl.dataset.maxHeight !== undefined
       ? Number(scriptEl.dataset.maxHeight)
       : runtimeConfig?.feedMaxHeight ?? 600;
+  
+  // Extract component visibility settings
+  const components = runtimeConfig?.components ?? {};
 
   if (!username) {
     console.error(
@@ -94,6 +106,7 @@ function mount() {
         routeId={routeId}
         view={view}
         feedMaxHeight={feedMaxHeight}
+        components={components}
       />
     </React.StrictMode>
   );
@@ -108,6 +121,13 @@ interface MountOptions {
   routeId?: string;
   view?: "stream" | "route";
   feedMaxHeight?: number;
+  components?: {
+    map?: boolean;
+    posts?: boolean;
+    elevation?: boolean;
+    route?: boolean;
+    profile?: boolean;
+  };
 }
 
 function mountTo(options: MountOptions) {
@@ -128,6 +148,7 @@ function mountTo(options: MountOptions) {
         routeId={options.routeId}
         view={options.view}
         feedMaxHeight={options.feedMaxHeight}
+        components={options.components}
       />
     </React.StrictMode>
   );

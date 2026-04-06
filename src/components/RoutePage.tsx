@@ -14,6 +14,14 @@ interface RoutePageProps {
   username: string;
   /** The routeId to display */
   routeId: string;
+  /** Component visibility settings */
+  components?: {
+    map?: boolean;
+    posts?: boolean;
+    elevation?: boolean;
+    route?: boolean;
+    profile?: boolean;
+  };
 }
 
 interface GeoJsonCoordinate {
@@ -42,7 +50,7 @@ function formatGain(feet: number | null | undefined): string {
   return `${feet.toLocaleString()} ft`;
 }
 
-export function RoutePage({ username, routeId }: RoutePageProps) {
+export function RoutePage({ username, routeId, components = {} }: RoutePageProps) {
   const { apiToken, isReady, error: authError } = useUser();
   const { theme } = useTheme();
   const isDark = theme === "dark";
@@ -52,6 +60,11 @@ export function RoutePage({ username, routeId }: RoutePageProps) {
   const [loading, setLoading] = useState(true);
   const [geoLoading, setGeoLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Default all components to visible if not explicitly set
+  const showMap = components.map !== false;
+  const showElevation = components.elevation !== false;
+  const showRoute = components.route !== false;
 
   const cardBg = isDark
     ? "bg-gray-900/95 border-gray-700"
@@ -169,78 +182,84 @@ export function RoutePage({ username, routeId }: RoutePageProps) {
   return (
     <div className={`ce-route-page flex flex-col gap-4`}>
       {/* Route header card */}
-      <div className={`${cardBg} border rounded-lg shadow-lg p-4`}>
-        <div className="flex items-start gap-3">
-          <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center">
-            <i className="pi pi-map text-red-400 text-lg" />
+      {showRoute && (
+        <div className={`${cardBg} border rounded-lg shadow-lg p-4`}>
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center">
+              <i className="pi pi-map text-red-400 text-lg" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h2 className={`text-lg font-bold ${textColor} truncate`}>
+                {route.name}
+              </h2>
+              <p className={`text-sm ${mutedColor}`}>{username}</p>
+            </div>
           </div>
-          <div className="flex-1 min-w-0">
-            <h2 className={`text-lg font-bold ${textColor} truncate`}>
-              {route.name}
-            </h2>
-            <p className={`text-sm ${mutedColor}`}>{username}</p>
-          </div>
-        </div>
 
-        {/* Stats row */}
-        <div className={`flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-sm ${mutedColor}`}>
-          {route.distanceInMiles != null && (
-            <div className="flex items-center gap-1">
-              <i className="pi pi-arrows-h text-xs" />
-              <span>{formatDistance(route.distanceInMiles)}</span>
-            </div>
-          )}
-          {route.gainInFeet != null && (
-            <div className="flex items-center gap-1">
-              <i className="pi pi-arrow-up text-xs" />
-              <span>{formatGain(route.gainInFeet)} gain</span>
-            </div>
-          )}
-          {route.uom && (
-            <div className="flex items-center gap-1">
-              <i className="pi pi-tag text-xs" />
-              <span>{route.uom}</span>
-            </div>
-          )}
+          {/* Stats row */}
+          <div className={`flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-sm ${mutedColor}`}>
+            {route.distanceInMiles != null && (
+              <div className="flex items-center gap-1">
+                <i className="pi pi-arrows-h text-xs" />
+                <span>{formatDistance(route.distanceInMiles)}</span>
+              </div>
+            )}
+            {route.gainInFeet != null && (
+              <div className="flex items-center gap-1">
+                <i className="pi pi-arrow-up text-xs" />
+                <span>{formatGain(route.gainInFeet)} gain</span>
+              </div>
+            )}
+            {route.uom && (
+              <div className="flex items-center gap-1">
+                <i className="pi pi-tag text-xs" />
+                <span>{route.uom}</span>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Map + Elevation */}
-      <div className={`${cardBg} border rounded-lg shadow-lg overflow-hidden`}>
-        {/* Map */}
-        <div className="border-b border-gray-700">
-          <div className="flex items-center gap-2 px-4 py-3">
-            <i className="pi pi-map-marker text-red-500 text-sm" />
-            <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
-              Route Mapppp
-            </span>
-          </div>
-          {geoLoading ? (
-            <div className="flex items-center justify-center h-64 text-gray-500 text-sm">
-              Loading map…
+      {(showMap || showElevation) && (
+        <div className={`${cardBg} border rounded-lg shadow-lg overflow-hidden`}>
+          {/* Map */}
+          {showMap && (
+            <div className="border-b border-gray-700">
+              <div className="flex items-center gap-2 px-4 py-3">
+                <i className="pi pi-map-marker text-red-500 text-sm" />
+                <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
+                  Route Mapppp
+                </span>
+              </div>
+              {geoLoading ? (
+                <div className="flex items-center justify-center h-64 text-gray-500 text-sm">
+                  Loading map…
+                </div>
+              ) : (
+                <CoverMap routeGeoJson={routeGeoJson} height={320} />
+              )}
             </div>
-          ) : (
-            <CoverMap routeGeoJson={routeGeoJson} height={320} />
+          )}
+
+          {/* Elevation Profile */}
+          {altitudeProfile.length >= 2 && showElevation && (
+            <div>
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-700">
+                <i className="pi pi-chart-line text-red-500 text-sm" />
+                <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
+                  Elevation Profile
+                </span>
+              </div>
+              <ElevationProfile
+                waypoints={[]}
+                altitudeProfile={altitudeProfile}
+                distanceLabels={distanceLabels}
+              />
+            </div>
           )}
         </div>
-
-        {/* Elevation Profile */}
-        {altitudeProfile.length >= 2 && (
-          <div>
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-700">
-              <i className="pi pi-chart-line text-red-500 text-sm" />
-              <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
-                Elevation Profile
-              </span>
-            </div>
-            <ElevationProfile
-              waypoints={[]}
-              altitudeProfile={altitudeProfile}
-              distanceLabels={distanceLabels}
-            />
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 }

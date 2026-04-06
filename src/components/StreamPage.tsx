@@ -24,13 +24,21 @@ interface StreamPageProps {
   streamId: string;
   /** Maximum height (px) of the feed/posts scroll area. Default: 600 */
   feedMaxHeight?: number;
+  /** Component visibility settings */
+  components?: {
+    map?: boolean;
+    posts?: boolean;
+    elevation?: boolean;
+    route?: boolean;
+    profile?: boolean;
+  };
 }
 
 interface StreamProfileResponse {
   getUserByUserName: User;
 }
 
-export function StreamPage({ username, streamId, feedMaxHeight = 600 }: StreamPageProps) {
+export function StreamPage({ username, streamId, feedMaxHeight = 600, components = {} }: StreamPageProps) {
   const { apiToken, isReady, error: authError } = useUser();
   const { theme } = useTheme();
   const isDark = theme === "dark";
@@ -40,6 +48,12 @@ export function StreamPage({ username, streamId, feedMaxHeight = 600 }: StreamPa
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Default all components to visible if not explicitly set
+  const showMap = components.map !== false;
+  const showPosts = components.posts !== false;
+  const showElevation = components.elevation !== false;
+  const showProfile = components.profile !== false;
 
   const cardBg = isDark
     ? "bg-gray-900/95 border-gray-700"
@@ -168,32 +182,34 @@ export function StreamPage({ username, streamId, feedMaxHeight = 600 }: StreamPa
   return (
     <div className="ce-stream-page">
       {/* Profile header card */}
-      <LiveProfileCard
-        username={user.username}
-        profilePicture={getProfilePictureUrl({
-          profilePicture: user.profilePicture,
-        })}
-        streamTitle={user.liveStreams?.[0]?.title}
-        startTime={startTime}
-        finishTime={finishTime}
-        timezone={stream.timezone}
-        isLive={isLive}
-        routeId={stream.route?.routeId ?? null}
-        routeName={stream.route?.name ?? null}
-      />
+      {showProfile && (
+        <LiveProfileCard
+          username={user.username}
+          profilePicture={getProfilePictureUrl({
+            profilePicture: user.profilePicture,
+          })}
+          streamTitle={user.liveStreams?.[0]?.title}
+          startTime={startTime}
+          finishTime={finishTime}
+          timezone={stream.timezone}
+          isLive={isLive}
+          routeId={stream.route?.routeId ?? null}
+          routeName={stream.route?.name ?? null}
+        />
+      )}
 
       {/* Map + Chat side-by-side on md+ screens */}
       {(hasMap || chatMessages.length > 0) && (
         <div className="flex flex-col gap-3">
           {/* Map */}
-          {hasMap && (
+          {hasMap && showMap && (
             <div
               className={`${cardBg} border rounded-lg shadow-lg overflow-hidden flex-1 min-w-0`}
             >
               <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-700">
                 <i className="pi pi-map-marker text-red-500 text-sm" />
                 <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
-                  Route Mapeee
+                  Route Map
                 </span>
               </div>
               <CoverMap
@@ -221,7 +237,7 @@ export function StreamPage({ username, streamId, feedMaxHeight = 600 }: StreamPa
       )}
 
       {/* Elevation Profile */}
-      {waypointsWithAlt.length >= 2 && (
+      {waypointsWithAlt.length >= 2 && showElevation && (
         <div
           className={`${cardBg} border rounded-lg shadow-lg overflow-hidden`}
         >
@@ -236,7 +252,7 @@ export function StreamPage({ username, streamId, feedMaxHeight = 600 }: StreamPa
       )}
 
       {/* Feed / Posts */}
-      {posts.length > 0 && (
+      {posts.length > 0 && showPosts && (
         <div
           className={`${cardBg} border rounded-lg shadow-lg overflow-hidden`}
         >

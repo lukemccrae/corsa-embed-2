@@ -15,9 +15,17 @@ interface AppProps {
   view?: "stream" | "route";
   /** Maximum height (px) for the feed/posts scroll area. Default: 600 */
   feedMaxHeight?: number;
+  /** Component visibility settings */
+  components?: {
+    map?: boolean;
+    posts?: boolean;
+    elevation?: boolean;
+    route?: boolean;
+    profile?: boolean;
+  };
 }
 
-export default function App({ username, streamId, routeId, view, feedMaxHeight }: AppProps) {
+export default function App({ username, streamId, routeId, view, feedMaxHeight, components }: AppProps) {
   const resolvedView: "stream" | "route" =
     view === "route" || (!streamId && routeId) ? "route" : "stream";
 
@@ -27,9 +35,9 @@ export default function App({ username, streamId, routeId, view, feedMaxHeight }
         <UserProvider>
           <div className="max-w-md mx-auto w-full">
             {resolvedView === "route" && routeId ? (
-              <RoutePage username={username} routeId={routeId} />
+              <RoutePage username={username} routeId={routeId} components={components} />
             ) : streamId ? (
-              <StreamPage username={username} streamId={streamId} feedMaxHeight={feedMaxHeight} />
+              <StreamPage username={username} streamId={streamId} feedMaxHeight={feedMaxHeight} components={components} />
             ) : (
               <div className="p-6 text-red-300 bg-gray-900 rounded-lg text-center text-sm">
                 Missing stream or route configuration.
