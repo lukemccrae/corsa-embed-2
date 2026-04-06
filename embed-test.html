@@ -22,27 +22,34 @@
         font-size: 13px;
       }
 
-      /* Optional: provide runtime config override instead of build-time env vars */
-      /*
+      <!--
+        Optional: provide runtime Firebase config override instead of build-time env vars.
+        Set window.__CORSA_EMBED_CONFIG__ *before* loading bundle.js.
+        The embed resolves config in this order:
+          1. window.__CORSA_EMBED_CONFIG__.firebase  (runtime – highest priority)
+          2. VITE_FIREBASE_* env vars               (build-time)
+          3. Bundled corsa-auth project defaults    (lowest priority)
+      -->
+      <!--
       <script>
         window.__CORSA_EMBED_CONFIG__ = {
           firebase: {
-            apiKey: "...",
-            authDomain: "...",
-            projectId: "...",
-            storageBucket: "...",
-            messagingSenderId: "...",
-            appId: "..."
+            apiKey: "AIzaSy...",
+            authDomain: "your-project.firebaseapp.com",
+            projectId: "your-project",
+            storageBucket: "your-project.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abc123def456"
           },
           domain: {
-            appsyncEndpoint: "https://...",
-            appsyncRealtimeEndpoint: "wss://...",
-            cdnBase: "https://..."
+            appsyncEndpoint: "https://....appsync-api.us-east-1.amazonaws.com/graphql",
+            appsyncRealtimeEndpoint: "wss://....appsync-realtime-api.us-east-1.amazonaws.com/graphql",
+            cdnBase: "https://your-cdn.cloudfront.net"
           },
           feedMaxHeight: 600
         };
       </script>
-      */
+      -->
     </style>
   </head>
   <body>
