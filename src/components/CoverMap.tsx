@@ -40,6 +40,24 @@ function BoundsUpdater({ positions }: BoundsUpdaterProps) {
   return null;
 }
 
+/**
+ * Watches the map's container element for size changes and calls
+ * `invalidateSize()` so Leaflet redraws tiles correctly after a resize.
+ */
+function MapInvalidator() {
+  const map = useMap();
+  useEffect(() => {
+    const container = map.getContainer();
+    if (!container) return;
+    const observer = new ResizeObserver(() => {
+      map.invalidateSize();
+    });
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [map]);
+  return null;
+}
+
 interface GeoJsonLine {
   /** Array of [lng, lat, alt?] coordinate tuples from a GeoJSON file */
   coordinates: [number, number, number?][];
@@ -51,10 +69,16 @@ export interface CoverMapProps {
   /** Optional GeoJSON route line (e.g. from a pre-planned route) */
   routeGeoJson?: GeoJsonLine | null;
   isLive?: boolean;
-  /** Map height in pixels, defaults to 360 */
+  /** Map height in pixels. When omitted, height is controlled by CSS (e.g. via wrapperClassName). */
   height?: number;
   /** Stream posts to render as map markers (only those with a location are shown) */
   posts?: Post[];
+  /**
+   * Optional CSS class(es) to apply to the outer wrapper div.
+   * When provided the `height` prop is ignored and height is expected to come
+   * from the class (useful for container-query-driven responsive heights).
+   */
+  wrapperClassName?: string;
 }
 
 export function CoverMap({
@@ -63,6 +87,7 @@ export function CoverMap({
   isLive,
   height = 360,
   posts = [],
+  wrapperClassName,
 }: CoverMapProps) {
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
 
@@ -141,7 +166,10 @@ export function CoverMap({
 
   return (
     <>
-      <div className="w-full rounded-lg overflow-hidden" style={{ height }}>
+      <div
+        className={['w-full rounded-lg overflow-hidden', wrapperClassName].filter(Boolean).join(' ')}
+        style={wrapperClassName ? undefined : { height }}
+      >
         <MapContainer
           center={defaultCenter}
           zoom={11}
@@ -156,6 +184,7 @@ export function CoverMap({
           {allPositions.length > 0 && (
             <BoundsUpdater positions={allPositions} />
           )}
+          <MapInvalidator />
 
           {/* Reference route polyline (e.g. pre-planned GeoJSON route) */}
           {routePositions.length > 1 && (
