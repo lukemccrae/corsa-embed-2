@@ -82,13 +82,12 @@
   gap: 10px;
 }
 
-/* On wider containers: two-column layout */
+/* On wider containers: map stays full width, other content flows below */
 @container corsa-embed (min-width: 700px) {
   .ce-stream-grid {
-    display: grid;
-    grid-template-columns: 1.1fr 0.9fr;
+    display: flex;
+    flex-direction: column;
     gap: 12px;
-    align-items: start;
   }
 }
 
