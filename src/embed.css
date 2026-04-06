@@ -14,6 +14,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ---- Outer container inserted by main.tsx ---- */
+.corsa-embed-container {
+  width: 100%;
+  box-sizing: border-box;
+}
 
 .ce-stream-page *,
 .ce-stream-page *::before,
@@ -32,13 +37,17 @@
   color: #e0e0e0;
   background: #0f0f0f;
   border-radius: 14px;
-  max-width: 900px;
+  width: 100%;
+  max-width: 100%;
   margin: 0 auto;
   padding: 12px;
   display: flex;
   flex-direction: column;
   gap: 10px;
   overflow: hidden;
+  /* Enable CSS container queries so children can respond to this element's width */
+  container-type: inline-size;
+  container-name: corsa-embed;
 }
 
 .ce-route-page {
@@ -46,13 +55,52 @@
   color: #e0e0e0;
   background: #0f0f0f;
   border-radius: 14px;
-  max-width: 900px;
+  width: 100%;
+  max-width: 100%;
   margin: 0 auto;
   padding: 12px;
   display: flex;
   flex-direction: column;
   gap: 10px;
   overflow: hidden;
+  container-type: inline-size;
+  container-name: corsa-embed;
+}
+
+/* Ensure images and maps never overflow their containers */
+.ce-stream-page img,
+.ce-route-page img,
+.ce-stream-page .leaflet-container,
+.ce-route-page .leaflet-container {
+  max-width: 100%;
+}
+
+/* ---- Responsive grid: map + elevation | posts ---- */
+.ce-stream-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* On wider containers: two-column layout */
+@container corsa-embed (min-width: 700px) {
+  .ce-stream-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 12px;
+    align-items: start;
+  }
+}
+
+/* ---- Responsive map height ---- */
+.ce-map-responsive {
+  height: 320px;
+}
+
+@container corsa-embed (min-width: 700px) {
+  .ce-map-responsive {
+    height: 480px;
+  }
 }
 
 /* ---- Shared card / section card ---- */

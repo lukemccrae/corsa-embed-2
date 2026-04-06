@@ -43,19 +43,100 @@ All TypeScript types are sourced from `src/generated/schema.ts` (generated via G
 
 ## Embedding
 
+### Recommended embed snippet
+
+Use a wrapper `<div>` to control the embed's dimensions. The embed will fill its
+container 100 % horizontally and grow vertically to fit its content.
+
 ```html
+<!-- 1. Optional runtime config (must appear before bundle.js) -->
 <script>
   window.__CORSA_EMBED_CONFIG__ = {
-    firebase: { apiKey: "...", authDomain: "...", ... },
-    domain: { appsyncEndpoint: "...", appsyncRealtimeEndpoint: "...", cdnBase: "..." }
+    feedMaxHeight: 600,           // px – max height of the scrollable posts list
+    components: {                 // toggle individual sections on/off
+      map: true,
+      posts: true,
+      elevation: true,
+      route: true,
+      profile: true
+    }
   };
 </script>
-<script src="bundle.js"></script>
-<script>CorsaEmbed.mount(document.getElementById("embed"), { username: "alice", streamId: "stream-123" });</script>
+
+<!-- 2. Size the embed via a wrapper div, then load the bundle -->
+<div style="width: 100%; max-width: 1200px;">
+  <script
+    src="https://your-cdn/bundle.js"
+    data-username="alice"
+    data-stream-id="stream-123"
+  ></script>
+</div>
 ```
 
-> **No additional CSS files needed.** PrimeReact (lara-dark-blue theme), PrimeIcons, and Tailwind
-> CSS utilities are all bundled into `bundle.js` by `vite-plugin-css-injected-by-js`.
+The bundle inserts a `<div class="corsa-embed-container">` immediately after the
+`<script>` tag and mounts the React app into it. That container is `width: 100%`
+by default, so it fills whatever wrapper you provide.
+
+#### Controlling height
+
+The embed sizes itself to its content by default. To cap the overall height of
+the widget, wrap it in a fixed-height div with `overflow: hidden` (or
+`overflow: auto`):
+
+```html
+<div style="width: 100%; max-width: 1200px; height: 700px; overflow: hidden;">
+  <script src="bundle.js" data-username="alice" data-stream-id="stream-123"></script>
+</div>
+```
+
+#### Mounting into an existing element (`data-mount`)
+
+If you prefer to mount the embed into a pre-existing element on the page, add
+the `data-mount` attribute with a CSS selector:
+
+```html
+<div id="my-embed" style="width: 800px;"></div>
+
+<script
+  src="bundle.js"
+  data-username="alice"
+  data-stream-id="stream-123"
+  data-mount="#my-embed"
+></script>
+```
+
+#### Manual / programmatic mounting
+
+```html
+<div id="my-embed" style="width: 100%;"></div>
+
+<script src="bundle.js"></script>
+<script>
+  CorsaEmbed.mount({
+    elementId: 'my-embed',
+    username: 'alice',
+    streamId: 'stream-123',
+    feedMaxHeight: 500,
+    components: { map: true, posts: true, elevation: true }
+  });
+</script>
+```
+
+### Responsive layout
+
+The embed uses **CSS container queries** (`@container`) to adapt its internal
+layout to the width of its container:
+
+| Container width | Layout |
+|---|---|
+| < 700 px | Single-column (map stacked above posts) |
+| ≥ 700 px | Two-column grid (map + elevation on the left, posts on the right) |
+
+The 700 px breakpoint is defined in `src/embed.css`. If you fork or customise
+the CSS, keep the documentation and CSS value in sync.
+
+> **No additional CSS files needed.** PrimeReact (lara-dark-blue theme),
+> PrimeIcons, and Tailwind CSS utilities are all bundled into `bundle.js`.
 
 ## Map Features
 

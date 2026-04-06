@@ -181,7 +181,7 @@ export function StreamPage({ username, streamId, feedMaxHeight = 600, components
 
   return (
     <div className="ce-stream-page">
-      {/* Profile header card */}
+      {/* Profile header card – always full width */}
       {showProfile && (
         <LiveProfileCard
           username={user.username}
@@ -198,80 +198,72 @@ export function StreamPage({ username, streamId, feedMaxHeight = 600, components
         />
       )}
 
-      {/* Map + Chat side-by-side on md+ screens */}
-      {(hasMap || chatMessages.length > 0) && (
-        <div className="flex flex-col gap-3">
-          {/* Map */}
-          {hasMap && showMap && (
+      {/* Responsive grid: single column on narrow, two columns on wide containers */}
+      <div className="ce-stream-grid">
+        {/* Left / top column: Map + Elevation */}
+        {(hasMap || waypointsWithAlt.length >= 2) && (
+          <div className="ce-stream-col-main flex flex-col gap-3">
+            {/* Map */}
+            {hasMap && showMap && (
+              <div
+                className={`${cardBg} border rounded-lg shadow-lg overflow-hidden`}
+              >
+                <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-700">
+                  <i className="pi pi-map-marker text-red-500 text-sm" />
+                  <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
+                    Route Map
+                  </span>
+                </div>
+                <CoverMap
+                  waypoints={publicWaypoints}
+                  isLive={isLive}
+                  wrapperClassName="ce-map-responsive"
+                  posts={posts}
+                />
+              </div>
+            )}
+
+            {/* Elevation Profile */}
+            {waypointsWithAlt.length >= 2 && showElevation && (
+              <div
+                className={`${cardBg} border rounded-lg shadow-lg overflow-hidden`}
+              >
+                <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-700">
+                  <i className="pi pi-chart-line text-red-500 text-sm" />
+                  <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
+                    Elevation Profile
+                  </span>
+                </div>
+                <ElevationProfile waypoints={publicWaypoints} />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Right / bottom column: Posts */}
+        {posts.length > 0 && showPosts && (
+          <div className="ce-stream-col-side">
             <div
-              className={`${cardBg} border rounded-lg shadow-lg overflow-hidden flex-1 min-w-0`}
+              className={`${cardBg} border rounded-lg shadow-lg overflow-hidden`}
             >
               <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-700">
-                <i className="pi pi-map-marker text-red-500 text-sm" />
+                <i className="pi pi-book text-red-500 text-sm" />
                 <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
-                  Route Map
+                  Posts
                 </span>
               </div>
-              <CoverMap
-                waypoints={publicWaypoints}
-                isLive={isLive}
-                height={320}
-                posts={posts}
-              />
+              <div
+                className="ce-feed-scroll flex flex-col gap-3 p-4"
+                style={{ maxHeight: feedMaxHeight, overflowY: "auto", overscrollBehavior: "contain" }}
+              >
+                {posts.map((post, i) => (
+                  <FeedItem key={`${post.createdAt}-${i}`} post={post} user={user} />
+                ))}
+              </div>
             </div>
-          )}
-
-          {/* Chat */}
-          {/* <div
-            className={`${cardBg} border rounded-lg shadow-lg overflow-hidden w-full flex flex-col`}
-            style={{ minHeight: 320, maxHeight: 400 }}
-          >
-            <ProfileLiveChat
-              initialMessages={chatMessages}
-              streamId={streamId}
-              apiToken={apiToken}
-              isLive={isLive}
-            />
-          </div> */}
-        </div>
-      )}
-
-      {/* Elevation Profile */}
-      {waypointsWithAlt.length >= 2 && showElevation && (
-        <div
-          className={`${cardBg} border rounded-lg shadow-lg overflow-hidden`}
-        >
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-700">
-            <i className="pi pi-chart-line text-red-500 text-sm" />
-            <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
-              Elevation Profile
-            </span>
           </div>
-          <ElevationProfile waypoints={publicWaypoints} />
-        </div>
-      )}
-
-      {/* Feed / Posts */}
-      {posts.length > 0 && showPosts && (
-        <div
-          className={`${cardBg} border rounded-lg shadow-lg overflow-hidden`}
-        >
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-700">
-            <i className="pi pi-book text-red-500 text-sm" />
-            <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
-              Posts
-            </span>
-          </div>
-          <div
-            className="ce-feed-scroll flex flex-col gap-3 p-4"
-            style={{ maxHeight: feedMaxHeight, overflowY: "auto", overscrollBehavior: "contain" }}
-          >
-            {posts.map((post, i) => (
-              <FeedItem key={`${post.createdAt}-${i}`} post={post} user={user} />
-            ))}
-          </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

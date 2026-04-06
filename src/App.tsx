@@ -33,7 +33,7 @@ export default function App({ username, streamId, routeId, view, feedMaxHeight, 
     <PrimeReactProvider>
       <ThemeProvider>
         <UserProvider>
-          <div className="max-w-md mx-auto w-full">
+          <div className="w-full">
             {resolvedView === "route" && routeId ? (
               <RoutePage username={username} routeId={routeId} components={components} />
             ) : streamId ? (
