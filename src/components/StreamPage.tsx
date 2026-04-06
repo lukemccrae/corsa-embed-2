@@ -165,7 +165,8 @@ export function StreamPage({ username, streamId, feedMaxHeight = 600, components
   const hasPostsWithLocation = posts.some(
     (p) => p.location?.lat != null && p.location?.lng != null,
   );
-  const hasMap = publicWaypoints.length > 0 || hasPostsWithLocation;
+  const currentLocation = stream.currentLocation ?? null;
+  const hasMap = publicWaypoints.length > 0 || hasPostsWithLocation || !!currentLocation;
 
   // Debug logging
   console.log('[StreamPage] Debug:', {
@@ -217,6 +218,7 @@ export function StreamPage({ username, streamId, feedMaxHeight = 600, components
                 isLive={isLive}
                 height={320}
                 posts={posts}
+                currentLocation={currentLocation}
               />
             </div>
           )}

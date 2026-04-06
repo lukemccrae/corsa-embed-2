@@ -10,7 +10,7 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import type { Post, StatusPost, Waypoint } from "../generated/schema";
+import type { LatLng, Post, StatusPost, Waypoint } from "../generated/schema";
 import { getPostImageUrl } from "../utils/userImages";
 
 // Fix Leaflet default icon resolution (no bundler plugin needed)
@@ -55,6 +55,8 @@ export interface CoverMapProps {
   height?: number;
   /** Stream posts to render as map markers (only those with a location are shown) */
   posts?: Post[];
+  /** Current location of the tracker (from stream.currentLocation), used as centering fallback */
+  currentLocation?: LatLng | null;
 }
 
 export function CoverMap({
@@ -63,6 +65,7 @@ export function CoverMap({
   isLive,
   height = 360,
   posts = [],
+  currentLocation,
 }: CoverMapProps) {
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
 
@@ -78,11 +81,6 @@ export function CoverMap({
         : [],
     [routeGeoJson],
   );
-
-  const trackerPos: [number, number] | null =
-    waypointPositions.length > 0
-      ? waypointPositions[waypointPositions.length - 1]
-      : null;
 
   // Default center when nothing is loaded yet
   const defaultCenter: [number, number] = [37.77, -122.42];
@@ -110,6 +108,22 @@ export function CoverMap({
   }, [posts]);
 
   const postPositions = locatedPosts.map(({ position }) => position);
+
+  // If no explicit currentLocation is provided, fall back to the most recent post that has a location.
+  // Posts are sorted newest-first, so locatedPosts[0] is the latest located post.
+  const lastPostLocation = locatedPosts.length > 0
+    ? locatedPosts[0].position
+    : null;
+  const effectiveCurrentLocation: [number, number] | null =
+    currentLocation
+      ? [currentLocation.lat, currentLocation.lng]
+      : lastPostLocation;
+
+  const trackerPos: [number, number] | null =
+    waypointPositions.length > 0
+      ? waypointPositions[waypointPositions.length - 1]
+      : effectiveCurrentLocation;
+
   const allPositions = waypointPositions.length
     ? waypointPositions
     : routePositions.length
