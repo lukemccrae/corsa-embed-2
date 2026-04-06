@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "update": "yarn build && node upload.js"
+    "update": "yarn build && node upload.js && sh invalidate-cash.sh"
   },
   "dependencies": {
     "@aws-amplify/api": "^6.3.19",
