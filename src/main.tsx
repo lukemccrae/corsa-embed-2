@@ -95,6 +95,8 @@ function mount() {
     container = document.createElement("div");
     container.id = `corsa-embed-${streamId ?? routeId}`;
     container.className = "corsa-embed-container";
+    container.style.width = "100%";
+    container.style.boxSizing = "border-box";
     scriptEl.parentNode?.insertBefore(container, scriptEl.nextSibling);
   }
 
