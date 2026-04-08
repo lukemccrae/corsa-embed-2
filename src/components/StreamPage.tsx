@@ -17,6 +17,7 @@ import { FeedItem } from "./FeedItem";
 import { ElevationProfile } from "./ElevationProfile";
 import { getProfilePictureUrl } from "../utils/userImages";
 import { useTheme } from "./ThemeProvider";
+import { ChatPlaceholder } from "./ChatPlaceholder";
 
 interface StreamPageProps {
   username: string;
@@ -251,9 +252,7 @@ export function StreamPage({ username, streamId, feedMaxHeight = 600, components
       {/* Chat UI (placeholder) */}
       {showChat && (
         <div className="ce-stream-chat mt-4">
-          <div className="p-4 bg-gray-800 text-white rounded-lg text-center">
-            
-          </div>
+          <ChatPlaceholder />
         </div>
       )}
     </div>

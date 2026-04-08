@@ -366,6 +366,16 @@
   font-size: 13px;
 }
 
+/* ---- Chat placeholder ---- */
+.ce-chat-placeholder {
+  width: 100%;
+}
+
+.ce-chat-placeholder .ce-chat-messages {
+  max-height: 220px;
+  overflow-y: auto;
+}
+
 /* ---- Chat ---- */
 .ce-chat {
   padding: 0 0 14px;
