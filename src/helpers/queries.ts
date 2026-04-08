@@ -34,15 +34,19 @@ export const STREAM_PROFILE_QUERY = (
           lat
           lng
         }
-        chatMessages {
-          text
-          createdAt
-          streamId
-          userId
-          publicUser {
-            username
-            profilePicture
+        chatMessages(limit: 30) {
+          items {
+            text
+            createdAt
+            streamId
+            userId
+            publicUser {
+              username
+              profilePicture
+              userId
+            }
           }
+          nextToken
         }
         device {
           make
