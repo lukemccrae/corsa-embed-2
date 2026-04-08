@@ -17,14 +17,23 @@ interface ProfileLiveChatProps {
 
 function formatChatTime(iso: string): string {
   try {
-    return new Date(iso).toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-    });
+    const date = new Date(iso);
+    return date.toLocaleDateString("en-US", {
+      year: "2-digit",
+      month: "short",
+      day: "2-digit",
+    }) +
+      " " +
+      date.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+      });
   } catch {
     return "";
   }
 }
+
+import { useState } from "react";
 
 function ChatAvatar({
   username,
@@ -33,21 +42,21 @@ function ChatAvatar({
   username: string;
   profilePicture?: string | null;
 }) {
-  if (profilePicture) {
+  const [imgError, setImgError] = useState(false);
+  const showImg = profilePicture && !imgError;
+  if (showImg) {
     return (
       <img
         src={getProfilePictureUrl({ profilePicture })}
         alt={username}
         className="w-8 h-8 rounded-full object-cover flex-shrink-0 ring-1 ring-gray-700"
-        onError={(e) => {
-          (e.currentTarget as HTMLImageElement).style.display = "none";
-        }}
+        onError={() => setImgError(true)}
       />
     );
   }
   return (
     <div className="w-8 h-8 rounded-full flex-shrink-0 bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-300 ring-1 ring-gray-600">
-      {username.charAt(0).toUpperCase()}
+      {username?.charAt(0)?.toUpperCase() || "?"}
     </div>
   );
 }
@@ -60,7 +69,8 @@ export function ProfileLiveChat({
   hasMore = false,
   loadingMore = false,
 }: ProfileLiveChatProps) {
-  const messages = initialMessages;
+  // Reverse messages so newest is at the bottom
+  const messages = [...initialMessages].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
   const bottomRef = useRef<HTMLDivElement>(null);
   const prevCountRef = useRef(messages.length);
 
