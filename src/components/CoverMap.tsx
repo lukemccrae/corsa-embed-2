@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { toDDHHMMSS } from "../utils/time";
 import {
   MapContainer,
   TileLayer,
@@ -208,42 +209,53 @@ export function CoverMap({
           )}
 
           {/* Waypoint dot markers (all waypoints, with popup details) */}
-          {waypoints.map((w, idx) => (
-            <CircleMarker
-              key={`wp-dot-${idx}`}
-              center={[w.lat, w.lng]}
-              radius={4}
-              pathOptions={{
-                color: "#fff",
-                fillColor: "#ef4444",
-                fillOpacity: 1,
-                weight: 1.5,
-              }}
-            >
-              <Popup>
-                <div className="ce-wp-popup">
-                  {w.mileMarker != null && (
-                    <div className="ce-wp-popup-row">
-                      <span className="ce-wp-popup-label">Mile</span>
-                      <span className="ce-wp-popup-value">{w.mileMarker.toFixed(1)}</span>
-                    </div>
-                  )}
-                  {w.altitude != null && (
-                    <div className="ce-wp-popup-row">
-                      <span className="ce-wp-popup-label">Altitude</span>
-                      <span className="ce-wp-popup-value">{Math.round(w.altitude)} ft</span>
-                    </div>
-                  )}
-                  <div className="ce-wp-popup-row">
-                    <span className="ce-wp-popup-label">Time</span>
-                    <span className="ce-wp-popup-value">
-                      {new Date(w.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                    </span>
+          {waypoints.map((w, idx) => {
+            // Elapsed time from first waypoint
+            let elapsed: string | null = null;
+            if (waypoints.length > 0 && w.timestamp) {
+              const start = new Date(waypoints[0].timestamp).getTime();
+              const curr = new Date(w.timestamp).getTime();
+              let rawElapsed = toDDHHMMSS((curr - start) / 1000);
+              // Remove days part if 00d
+              elapsed = rawElapsed.replace(/^0{0,2}0?0?d\s*/, "");
+            }
+            return (
+              <CircleMarker
+                key={`wp-dot-${idx}`}
+                center={[w.lat, w.lng]}
+                radius={4}
+                pathOptions={{
+                  color: "#fff",
+                  fillColor: "#ef4444",
+                  fillOpacity: 1,
+                  weight: 1.5,
+                }}
+              >
+                <Popup>
+                  <div className="ce-wp-popup">
+                    {w.mileMarker != null && (
+                      <div className="ce-wp-popup-row">
+                        <span className="ce-wp-popup-label">Distance</span>
+                        <span className="ce-wp-popup-value">{w.mileMarker.toFixed(2)} mi</span>
+                      </div>
+                    )}
+                    {w.altitude != null && (
+                      <div className="ce-wp-popup-row">
+                        <span className="ce-wp-popup-label">Altitude</span>
+                        <span className="ce-wp-popup-value">{Math.round(w.altitude)} ft</span>
+                      </div>
+                    )}
+                    {elapsed && (
+                      <div className="ce-wp-popup-row">
+                        <span className="ce-wp-popup-label">Elapsed</span>
+                        <span className="ce-wp-popup-value">{elapsed}</span>
+                      </div>
+                    )}
                   </div>
-                </div>
-              </Popup>
-            </CircleMarker>
-          ))}
+                </Popup>
+              </CircleMarker>
+            );
+          })}
 
           {/* Live tracker dot at current position */}
           {trackerPos && isLive && (
@@ -292,6 +304,33 @@ export function CoverMap({
             const sp = post as StatusPost;
             const hasImage = !!sp.imagePath;
             const imageUrl = hasImage ? getPostImageUrl(sp.imagePath!) : null;
+            // Try to get distance, altitude, and elapsed time from the closest waypoint
+            let distance: number | null = null;
+            let altitude: number | null = null;
+            let elapsed: string | null = null;
+            if (waypoints && waypoints.length > 0 && post.createdAt) {
+              // Find the closest waypoint by timestamp
+              const postTime = new Date(post.createdAt).getTime();
+              let minDiff = Infinity;
+              let closest: Waypoint | null = null;
+              for (const w of waypoints) {
+                if (!w.timestamp) continue;
+                const wTime = new Date(w.timestamp).getTime();
+                const diff = Math.abs(wTime - postTime);
+                if (diff < minDiff) {
+                  minDiff = diff;
+                  closest = w;
+                }
+              }
+              if (closest) {
+                  distance = closest.mileMarker ?? null;
+                  altitude = closest.altitude ?? null;
+                  // Elapsed time from first waypoint
+                  const start = new Date(waypoints[0].timestamp).getTime();
+                  let rawElapsed = toDDHHMMSS((postTime - start) / 1000);
+                  elapsed = rawElapsed.replace(/^0{0,2}0?0?d\s*/, "");
+                }
+            }
             return (
               <Marker
                 key={`post-${post.createdAt}-${idx}`}
@@ -330,6 +369,23 @@ export function CoverMap({
                         onClick={() => setLightboxSrc(imageUrl)}
                       />
                     )}
+                    <div style={{ marginTop: 8, fontSize: 13, color: "#eee" }}>
+                      {distance !== null && (
+                        <div>
+                          <strong>Distance:</strong> {distance.toFixed(2)} mi
+                        </div>
+                      )}
+                      {altitude !== null && (
+                        <div>
+                          <strong>Altitude:</strong> {Math.round(altitude)} ft
+                        </div>
+                      )}
+                      {elapsed && (
+                        <div>
+                          <strong>Elapsed:</strong> {elapsed}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </Popup>
               </Marker>
