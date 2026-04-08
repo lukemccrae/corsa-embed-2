@@ -4,8 +4,6 @@ import { getProfilePictureUrl } from "../utils/userImages";
 
 interface ProfileLiveChatProps {
   initialMessages: ChatMessage[];
-  streamId: string;
-  apiToken: string | null;
   isLive?: boolean;
   /** Maximum height (px) of the chat scroll area. Default: 420 */
   chatMaxHeight?: number;
@@ -56,8 +54,6 @@ function ChatAvatar({
 
 export function ProfileLiveChat({
   initialMessages,
-  streamId: _streamId,
-  apiToken: _apiToken,
   isLive,
   chatMaxHeight = 420,
   onLoadMore,
