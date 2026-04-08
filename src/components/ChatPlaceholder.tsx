@@ -1,11 +1,11 @@
 import { useTheme } from "./ThemeProvider";
 
 const PLACEHOLDER_BUBBLES = [
-  { width: "70%", align: "left" },
-  { width: "50%", align: "right" },
-  { width: "60%", align: "left" },
-  { width: "45%", align: "right" },
-  { width: "55%", align: "left" },
+  { id: "bubble-1", width: "70%", align: "left" },
+  { id: "bubble-2", width: "50%", align: "right" },
+  { id: "bubble-3", width: "60%", align: "left" },
+  { id: "bubble-4", width: "45%", align: "right" },
+  { id: "bubble-5", width: "55%", align: "left" },
 ];
 
 export function ChatPlaceholder() {
@@ -40,9 +40,9 @@ export function ChatPlaceholder() {
 
       {/* Messages area */}
       <div className="ce-chat-messages flex flex-col gap-3 p-4">
-        {PLACEHOLDER_BUBBLES.map((bubble, i) => (
+        {PLACEHOLDER_BUBBLES.map((bubble) => (
           <div
-            key={i}
+            key={bubble.id}
             className={`flex ${bubble.align === "right" ? "justify-end" : "justify-start"}`}
           >
             <div
