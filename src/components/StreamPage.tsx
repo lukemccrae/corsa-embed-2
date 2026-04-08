@@ -61,6 +61,11 @@ interface ChatPageResponse {
   };
 }
 
+/** Returns a stable dedup key for a chat message. */
+function chatMessageKey(m: ChatMessage): string {
+  return `${m.createdAt}:${m.userId}`;
+}
+
 export function StreamPage({
   username,
   streamId,
@@ -159,8 +164,8 @@ export function StreamPage({
       (data) => {
         if (data.onNewChat) {
           setChatMessages((prev) => {
-            const key = `${data.onNewChat.createdAt}:${data.onNewChat.userId}`;
-            if (prev.some((m) => `${m.createdAt}:${m.userId}` === key)) {
+            const key = chatMessageKey(data.onNewChat);
+            if (prev.some((m) => chatMessageKey(m) === key)) {
               return prev;
             }
             return [...prev, data.onNewChat];
@@ -184,10 +189,10 @@ export function StreamPage({
       const nextItems: ChatMessage[] =
         nextConn?.items?.filter((m): m is ChatMessage => m != null) ?? [];
       setChatMessages((prev) => {
-        const seen = new Set(prev.map((m) => `${m.createdAt}:${m.userId}`));
+        const seen = new Set(prev.map(chatMessageKey));
         const older: ChatMessage[] = [];
         for (const m of nextItems) {
-          if (!seen.has(`${m.createdAt}:${m.userId}`)) older.push(m);
+          if (!seen.has(chatMessageKey(m))) older.push(m);
         }
         // Prepend older messages so newest remain at the bottom
         return [...older, ...prev];
@@ -336,8 +341,6 @@ export function StreamPage({
         <div className={`ce-section-card ${cardBg} border rounded-lg shadow-lg overflow-hidden`}>
           <ProfileLiveChat
             initialMessages={chatMessages}
-            streamId={streamId}
-            apiToken={apiToken}
             isLive={isLive}
             chatMaxHeight={chatMaxHeight}
             onLoadMore={loadMoreChat}
