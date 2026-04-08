@@ -22,6 +22,7 @@ interface AppProps {
     elevation?: boolean;
     route?: boolean;
     profile?: boolean;
+    chat?: boolean;
   };
 }
 

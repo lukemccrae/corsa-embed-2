@@ -30,6 +30,7 @@ interface StreamPageProps {
     elevation?: boolean;
     route?: boolean;
     profile?: boolean;
+    chat?: boolean;
   };
 }
 
@@ -53,6 +54,7 @@ export function StreamPage({ username, streamId, feedMaxHeight = 600, components
   const showPosts = components.posts !== false;
   const showElevation = components.elevation !== false;
   const showProfile = components.profile !== false;
+  const showChat = components.chat !== false;
 
   const cardBg = isDark
     ? "bg-gray-900/95 border-gray-700"
@@ -245,6 +247,15 @@ export function StreamPage({ username, streamId, feedMaxHeight = 600, components
           </div>
         )}
       </div>
+
+      {/* Chat UI (placeholder) */}
+      {showChat && (
+        <div className="ce-stream-chat mt-4">
+          <div className="p-4 bg-gray-800 text-white rounded-lg text-center">
+            
+          </div>
+        </div>
+      )}
     </div>
   );
 }
