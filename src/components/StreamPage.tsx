@@ -4,6 +4,7 @@ import type {
   LiveStream,
   Waypoint,
   Post,
+  ChatMessage,
 } from "../generated/schema";
 import { appsyncRequest } from "../helpers/appsync.helper";
 import { appsyncSubscribe } from "../helpers/appsync-subscription.helper";
@@ -12,7 +13,7 @@ import { useUser } from "../context/useUser";
 import { LoadingSkeleton } from "./LoadingSkeleton";
 import LiveProfileCard from "./ProfileCard";
 import { CoverMap } from "./CoverMap";
-// import { ProfileLiveChat } from "./ProfileLiveChat";
+import { ProfileLiveChat } from "./ProfileLiveChat";
 import { FeedItem } from "./FeedItem";
 import { ElevationProfile } from "./ElevationProfile";
 import { getProfilePictureUrl } from "../utils/userImages";
@@ -34,6 +35,12 @@ interface StreamPageProps {
   };
 }
 
+/** AppSync returns chatMessages as a connection with items + nextToken */
+interface ChatMessagesConnection {
+  items: ChatMessage[];
+  nextToken?: string | null;
+}
+
 interface StreamProfileResponse {
   getUserByUserName: User;
 }
@@ -45,7 +52,7 @@ export function StreamPage({ username, streamId, feedMaxHeight = 600, components
   const [user, setUser] = useState<User | null>(null);
   const [stream, setStream] = useState<LiveStream | null>(null);
   const [waypoints, setWaypoints] = useState<Waypoint[]>([]);
-  // const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -82,11 +89,13 @@ export function StreamPage({ username, streamId, feedMaxHeight = 600, components
         setWaypoints(
           liveStream?.waypoints?.filter((w): w is Waypoint => w != null) ?? [],
         );
-        // setChatMessages(
-        //   liveStream?.chatMessages?.filter(
-        //     (m): m is ChatMessage => m != null,
-        //   ) ?? [],
-        // );
+        // The API returns chatMessages as a connection ({ items, nextToken }),
+        // which differs from the generated schema type (plain array).
+        const chatConn = (liveStream as unknown as { chatMessages?: ChatMessagesConnection })
+          ?.chatMessages;
+        setChatMessages(
+          chatConn?.items?.filter((m): m is ChatMessage => m != null) ?? [],
+        );
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Failed to load stream data",
@@ -248,12 +257,15 @@ export function StreamPage({ username, streamId, feedMaxHeight = 600, components
         )}
       </div>
 
-      {/* Chat UI (placeholder) */}
+      {/* Chat */}
       {showChat && (
-        <div className="ce-stream-chat mt-4">
-          <div className="p-4 bg-gray-800 text-white rounded-lg text-center">
-            
-          </div>
+        <div className={`ce-section-card ${cardBg} border rounded-lg shadow-lg overflow-hidden`}>
+          <ProfileLiveChat
+            initialMessages={chatMessages}
+            streamId={streamId}
+            apiToken={apiToken}
+            isLive={isLive}
+          />
         </div>
       )}
     </div>

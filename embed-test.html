@@ -64,6 +64,21 @@
         data-max-height  — max height (px) of the posts/feed scroll region.
                            Default is 600. Set to a larger value or omit to
                            adjust how tall the feed can grow before scrolling.
+
+      Optional runtime config (set before the bundle script tag):
+        <script>
+          window.__CORSA_EMBED_CONFIG__ = {
+            feedMaxHeight: 600,
+            components: {
+              map: true,       // show/hide the map
+              posts: true,     // show/hide the posts feed
+              elevation: true, // show/hide the elevation chart
+              route: true,     // show/hide route info
+              profile: true,   // show/hide the profile header
+              chat: true,      // set to false to hide the live chat panel
+            }
+          };
+        </script>
     -->
     <script
       src="./dist-singlefile/bundle.js"

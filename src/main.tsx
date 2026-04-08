@@ -56,6 +56,7 @@ function mount() {
       elevation?: boolean;
       route?: boolean;
       profile?: boolean;
+      chat?: boolean;
     };
   } }).__CORSA_EMBED_CONFIG__;
   const feedMaxHeight =
@@ -129,6 +130,7 @@ interface MountOptions {
     elevation?: boolean;
     route?: boolean;
     profile?: boolean;
+    chat?: boolean;
   };
 }
 
