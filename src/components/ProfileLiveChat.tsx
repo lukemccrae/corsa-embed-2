@@ -1,14 +1,20 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import type { ChatMessage } from "../generated/schema";
-import { appsyncSubscribe } from "../helpers/appsync-subscription.helper";
 import { getProfilePictureUrl } from "../utils/userImages";
-import { ON_NEW_CHAT } from "../helpers/queries";
 
 interface ProfileLiveChatProps {
   initialMessages: ChatMessage[];
   streamId: string;
   apiToken: string | null;
   isLive?: boolean;
+  /** Maximum height (px) of the chat scroll area. Default: 420 */
+  chatMaxHeight?: number;
+  /** Called when the user requests older messages */
+  onLoadMore?: () => void;
+  /** Whether there are more pages to load */
+  hasMore?: boolean;
+  /** Whether a load-more request is in-flight */
+  loadingMore?: boolean;
 }
 
 function formatChatTime(iso: string): string {
@@ -50,37 +56,35 @@ function ChatAvatar({
 
 export function ProfileLiveChat({
   initialMessages,
-  streamId,
-  apiToken,
+  streamId: _streamId,
+  apiToken: _apiToken,
   isLive,
+  chatMaxHeight = 420,
+  onLoadMore,
+  hasMore = false,
+  loadingMore = false,
 }: ProfileLiveChatProps) {
-  const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
+  const messages = initialMessages;
   const bottomRef = useRef<HTMLDivElement>(null);
+  const prevCountRef = useRef(messages.length);
 
-  // Scroll to bottom when messages change
+  // Scroll to bottom only when a new message is appended (not when older ones are prepended)
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    const prev = prevCountRef.current;
+    const curr = messages.length;
+    prevCountRef.current = curr;
+    // If a message was appended at the end, scroll to bottom
+    if (curr > prev) {
+      const lastMsg = messages[curr - 1];
+      const prevLastMsg = prev > 0 ? messages[prev - 1] : null;
+      if (lastMsg !== prevLastMsg) {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+      }
+    }
   }, [messages]);
 
-  // Live subscription for new chat messages
-  useEffect(() => {
-    if (!apiToken || !isLive) return;
-
-    const unsub = appsyncSubscribe<{ onNewChat: ChatMessage }>(
-      ON_NEW_CHAT,
-      { streamId },
-      apiToken,
-      (data) => {
-        if (data.onNewChat) {
-          setMessages((prev) => [...prev, data.onNewChat]);
-        }
-      }
-    );
-    return unsub;
-  }, [apiToken, isLive, streamId]);
-
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col">
       {/* Header */}
       <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-700">
         <i className="pi pi-comments text-red-500 text-sm" />
@@ -95,8 +99,24 @@ export function ProfileLiveChat({
         )}
       </div>
 
+      {/* Load older messages */}
+      {hasMore && (
+        <div className="flex justify-center px-4 pt-3">
+          <button
+            onClick={onLoadMore}
+            disabled={loadingMore}
+            className="text-xs text-gray-400 hover:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed border border-gray-700 rounded px-3 py-1 transition-colors"
+          >
+            {loadingMore ? "Loading…" : "Load older messages"}
+          </button>
+        </div>
+      )}
+
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 min-h-0">
+      <div
+        className="overflow-y-auto px-4 py-3 space-y-3"
+        style={{ maxHeight: chatMaxHeight, overscrollBehavior: "contain" }}
+      >
         {messages.length === 0 ? (
           <p className="text-gray-500 text-sm text-center py-4">
             No messages yet.

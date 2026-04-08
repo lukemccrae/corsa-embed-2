@@ -8,7 +8,12 @@ import type {
 } from "../generated/schema";
 import { appsyncRequest } from "../helpers/appsync.helper";
 import { appsyncSubscribe } from "../helpers/appsync-subscription.helper";
-import { STREAM_PROFILE_QUERY, ON_NEW_WAYPOINT } from "../helpers/queries";
+import {
+  STREAM_PROFILE_QUERY,
+  STREAM_CHAT_PAGE_QUERY,
+  ON_NEW_WAYPOINT,
+  ON_NEW_CHAT,
+} from "../helpers/queries";
 import { useUser } from "../context/useUser";
 import { LoadingSkeleton } from "./LoadingSkeleton";
 import LiveProfileCard from "./ProfileCard";
@@ -24,6 +29,8 @@ interface StreamPageProps {
   streamId: string;
   /** Maximum height (px) of the feed/posts scroll area. Default: 600 */
   feedMaxHeight?: number;
+  /** Maximum height (px) of the chat scroll area. Default: 420 */
+  chatMaxHeight?: number;
   /** Component visibility settings */
   components?: {
     map?: boolean;
@@ -45,7 +52,22 @@ interface StreamProfileResponse {
   getUserByUserName: User;
 }
 
-export function StreamPage({ username, streamId, feedMaxHeight = 600, components = {} }: StreamPageProps) {
+/** ChatMessages page response shape returned by STREAM_CHAT_PAGE_QUERY */
+interface ChatPageResponse {
+  getUserByUserName: {
+    liveStreams: Array<{
+      chatMessages: ChatMessagesConnection;
+    }>;
+  };
+}
+
+export function StreamPage({
+  username,
+  streamId,
+  feedMaxHeight = 600,
+  chatMaxHeight = 420,
+  components = {},
+}: StreamPageProps) {
   const { apiToken, isReady, error: authError } = useUser();
   const { theme } = useTheme();
   const isDark = theme === "dark";
@@ -53,6 +75,8 @@ export function StreamPage({ username, streamId, feedMaxHeight = 600, components
   const [stream, setStream] = useState<LiveStream | null>(null);
   const [waypoints, setWaypoints] = useState<Waypoint[]>([]);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatNextToken, setChatNextToken] = useState<string | null>(null);
+  const [chatLoadingMore, setChatLoadingMore] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -96,6 +120,7 @@ export function StreamPage({ username, streamId, feedMaxHeight = 600, components
         setChatMessages(
           chatConn?.items?.filter((m): m is ChatMessage => m != null) ?? [],
         );
+        setChatNextToken(chatConn?.nextToken ?? null);
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Failed to load stream data",
@@ -123,6 +148,55 @@ export function StreamPage({ username, streamId, feedMaxHeight = 600, components
     );
     return unsub;
   }, [apiToken, stream, streamId]);
+
+  // Subscribe to live chat updates
+  useEffect(() => {
+    if (!apiToken || !stream?.live) return;
+    const unsub = appsyncSubscribe<{ onNewChat: ChatMessage }>(
+      ON_NEW_CHAT,
+      { streamId },
+      apiToken,
+      (data) => {
+        if (data.onNewChat) {
+          setChatMessages((prev) => {
+            const key = `${data.onNewChat.createdAt}:${data.onNewChat.userId}`;
+            if (prev.some((m) => `${m.createdAt}:${m.userId}` === key)) {
+              return prev;
+            }
+            return [...prev, data.onNewChat];
+          });
+        }
+      },
+    );
+    return unsub;
+  }, [apiToken, stream, streamId]);
+
+  async function loadMoreChat() {
+    if (!apiToken || chatLoadingMore || !chatNextToken) return;
+    setChatLoadingMore(true);
+    try {
+      const data = await appsyncRequest<ChatPageResponse>(
+        STREAM_CHAT_PAGE_QUERY(username, streamId, chatNextToken),
+        {},
+        apiToken,
+      );
+      const nextConn = data?.getUserByUserName?.liveStreams?.[0]?.chatMessages;
+      const nextItems: ChatMessage[] =
+        nextConn?.items?.filter((m): m is ChatMessage => m != null) ?? [];
+      setChatMessages((prev) => {
+        const seen = new Set(prev.map((m) => `${m.createdAt}:${m.userId}`));
+        const older: ChatMessage[] = [];
+        for (const m of nextItems) {
+          if (!seen.has(`${m.createdAt}:${m.userId}`)) older.push(m);
+        }
+        // Prepend older messages so newest remain at the bottom
+        return [...older, ...prev];
+      });
+      setChatNextToken(nextConn?.nextToken ?? null);
+    } finally {
+      setChatLoadingMore(false);
+    }
+  }
 
   if (authError) {
     return (
@@ -265,6 +339,10 @@ export function StreamPage({ username, streamId, feedMaxHeight = 600, components
             streamId={streamId}
             apiToken={apiToken}
             isLive={isLive}
+            chatMaxHeight={chatMaxHeight}
+            onLoadMore={loadMoreChat}
+            hasMore={chatNextToken != null}
+            loadingMore={chatLoadingMore}
           />
         </div>
       )}

@@ -50,6 +50,7 @@ function mount() {
   // Resolve feedMaxHeight: data-max-height attr > window config > default (600)
   const runtimeConfig = (window as Window & { __CORSA_EMBED_CONFIG__?: { 
     feedMaxHeight?: number;
+    chatMaxHeight?: number;
     components?: {
       map?: boolean;
       posts?: boolean;
@@ -63,6 +64,10 @@ function mount() {
     scriptEl.dataset.maxHeight !== undefined
       ? Number(scriptEl.dataset.maxHeight)
       : runtimeConfig?.feedMaxHeight ?? 600;
+  const chatMaxHeight =
+    scriptEl.dataset.chatMaxHeight !== undefined
+      ? Number(scriptEl.dataset.chatMaxHeight)
+      : runtimeConfig?.chatMaxHeight ?? 420;
   
   // Extract component visibility settings
   const components = runtimeConfig?.components ?? {};
@@ -109,6 +114,7 @@ function mount() {
         routeId={routeId}
         view={view}
         feedMaxHeight={feedMaxHeight}
+        chatMaxHeight={chatMaxHeight}
         components={components}
       />
     </React.StrictMode>
@@ -124,6 +130,7 @@ interface MountOptions {
   routeId?: string;
   view?: "stream" | "route";
   feedMaxHeight?: number;
+  chatMaxHeight?: number;
   components?: {
     map?: boolean;
     posts?: boolean;
@@ -152,6 +159,7 @@ function mountTo(options: MountOptions) {
         routeId={options.routeId}
         view={options.view}
         feedMaxHeight={options.feedMaxHeight}
+        chatMaxHeight={options.chatMaxHeight}
         components={options.components}
       />
     </React.StrictMode>

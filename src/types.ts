@@ -33,6 +33,8 @@ export interface CorsaWindow extends Window {
     domain?: DomainConfig;
     /** Maximum height (px) of the feed/posts scroll region. Default: 600 */
     feedMaxHeight?: number;
+    /** Maximum height (px) of the chat scroll region. Default: 420 */
+    chatMaxHeight?: number;
   };
 }
 

@@ -15,6 +15,8 @@ interface AppProps {
   view?: "stream" | "route";
   /** Maximum height (px) for the feed/posts scroll area. Default: 600 */
   feedMaxHeight?: number;
+  /** Maximum height (px) for the chat scroll area. Default: 420 */
+  chatMaxHeight?: number;
   /** Component visibility settings */
   components?: {
     map?: boolean;
@@ -26,7 +28,7 @@ interface AppProps {
   };
 }
 
-export default function App({ username, streamId, routeId, view, feedMaxHeight, components }: AppProps) {
+export default function App({ username, streamId, routeId, view, feedMaxHeight, chatMaxHeight, components }: AppProps) {
   const resolvedView: "stream" | "route" =
     view === "route" || (!streamId && routeId) ? "route" : "stream";
 
@@ -38,7 +40,7 @@ export default function App({ username, streamId, routeId, view, feedMaxHeight, 
             {resolvedView === "route" && routeId ? (
               <RoutePage username={username} routeId={routeId} components={components} />
             ) : streamId ? (
-              <StreamPage username={username} streamId={streamId} feedMaxHeight={feedMaxHeight} components={components} />
+              <StreamPage username={username} streamId={streamId} feedMaxHeight={feedMaxHeight} chatMaxHeight={chatMaxHeight} components={components} />
             ) : (
               <div className="p-6 text-red-300 bg-gray-900 rounded-lg text-center text-sm">
                 Missing stream or route configuration.

@@ -122,6 +122,37 @@ export const ON_NEW_WAYPOINT = /* GraphQL */ `
 `;
 
 /**
+ * Fetches a page of chat messages for a live stream, supporting pagination via
+ * nextToken.  Keeps the same string-interpolation pattern as STREAM_PROFILE_QUERY.
+ */
+export const STREAM_CHAT_PAGE_QUERY = (
+  username: string,
+  streamId: string,
+  nextToken?: string | null,
+) => /* GraphQL */ `
+  query ChatPage {
+    getUserByUserName(username: "${username}") {
+      liveStreams(streamId: "${streamId}") {
+        chatMessages(limit: 30${nextToken ? `, nextToken: "${nextToken}"` : ""}) {
+          items {
+            text
+            createdAt
+            streamId
+            userId
+            publicUser {
+              username
+              profilePicture
+              userId
+            }
+          }
+          nextToken
+        }
+      }
+    }
+  }
+`;
+
+/**
  * Fetches route metadata for a given user, used by the route embed.
  * Pass the routeId to filter the desired route on the client side.
  */
