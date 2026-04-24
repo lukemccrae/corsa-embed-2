@@ -304,7 +304,7 @@ export function StreamPage({
       {/* Notification if all waypoints are hidden */}
       {allWaypointsHidden && (
         <div className="p-4 mb-4 bg-yellow-100 text-yellow-800 rounded text-center text-sm border border-yellow-300">
-          All location points for this stream are currently hidden by the user.
+          Location points are currently hidden due to privacy settings.
         </div>
       )}
 
