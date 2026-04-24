@@ -30,6 +30,7 @@ export const STREAM_PROFILE_QUERY = (
         startTime
         finishTime
         live
+        delayInSeconds
         currentLocation {
           lat
           lng

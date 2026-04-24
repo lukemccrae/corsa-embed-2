@@ -243,8 +243,18 @@ export function StreamPage({
   const finishTime = user.liveStreams[0].finishTime ?? null;
   const isLive = !!(user.liveStreams[0].live && !finishTime);
 
-  // Filter out private waypoints for the map
-  const publicWaypoints = waypoints.filter((w) => !w.private);
+  // Filter out private waypoints and waypoints within the broadcast delay window
+  const delayMs = (stream.delayInSeconds ?? 0) * 1000;
+  const cutoffTime = Date.now() - delayMs;
+  const publicWaypoints = waypoints.filter((w) => {
+    if (w.private) return false;
+    if (delayMs > 0) {
+      const ts = new Date(w.timestamp).getTime();
+      if (isNaN(ts)) return false;
+      if (ts > cutoffTime) return false;
+    }
+    return true;
+  });
 
   const posts: Post[] =
     stream.posts?.filter((p): p is Post => p != null).sort((a, b) => 
