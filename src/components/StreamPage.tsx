@@ -275,8 +275,12 @@ export function StreamPage({
     hasMap,
   });
 
+
   // Only show elevation section when waypoints have altitude readings
   const waypointsWithAlt = publicWaypoints.filter((w) => w.altitude != null);
+
+  // Notification if all waypoints are hidden
+  const allWaypointsHidden = waypoints.length > 0 && publicWaypoints.length === 0;
 
   return (
     <div className="ce-stream-page">
@@ -295,6 +299,13 @@ export function StreamPage({
           routeId={stream.route?.routeId ?? null}
           routeName={stream.route?.name ?? null}
         />
+      )}
+
+      {/* Notification if all waypoints are hidden */}
+      {allWaypointsHidden && (
+        <div className="p-4 mb-4 bg-yellow-100 text-yellow-800 rounded text-center text-sm border border-yellow-300">
+          All location points for this stream are currently hidden by the user.
+        </div>
       )}
 
       {/* Responsive grid: single column on narrow, two columns on wide containers */}
