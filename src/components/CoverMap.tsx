@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toDDHHMMSS } from "../utils/time";
 import {
   MapContainer,
@@ -13,6 +13,26 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { Post, StatusPost, Waypoint } from "../generated/schema";
 import { getPostImageUrl } from "../utils/userImages";
+
+
+
+// Leaflet scale control as a React component
+function LeafletScaleControl() {
+  const map = useMap();
+  useEffect(() => {
+    const scale = L.control.scale({
+      maxWidth: 120,
+      metric: true,
+      imperial: true,
+      updateWhenIdle: false,
+    });
+    scale.addTo(map);
+    return () => {
+      scale.remove();
+    };
+  }, [map]);
+  return null;
+}
 
 // Fix Leaflet default icon resolution (no bundler plugin needed)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -92,6 +112,9 @@ export function CoverMap({
 }: CoverMapProps) {
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
 
+  // Ref to map container div (no longer used for scale)
+  const mapDivRef = useRef<HTMLDivElement>(null);
+
   const waypointPositions = useMemo<[number, number][]>(
     () => waypoints.map((w) => [w.lat, w.lng]),
     [waypoints],
@@ -165,9 +188,11 @@ export function CoverMap({
       popupAnchor: [0, -24  ],
     });
 
+
   return (
     <>
       <div
+        ref={mapDivRef}
         className={['w-full rounded-lg overflow-hidden', wrapperClassName].filter(Boolean).join(' ')}
         style={wrapperClassName ? undefined : { height }}
       >
@@ -233,7 +258,7 @@ export function CoverMap({
               >
                 <Popup>
                   <div className="ce-wp-popup">
-                    {w.mileMarker != null && (
+                    {routeGeoJson && w.mileMarker != null && (
                       <div className="ce-wp-popup-row">
                         <span className="ce-wp-popup-label">Distance</span>
                         <span className="ce-wp-popup-value">{w.mileMarker.toFixed(2)} mi</span>
@@ -370,7 +395,7 @@ export function CoverMap({
                       />
                     )}
                     <div style={{ marginTop: 8, fontSize: 13, color: "#eee" }}>
-                      {distance !== null && (
+                      {routeGeoJson && distance !== null && (
                         <div>
                           <strong>Distance:</strong> {distance.toFixed(2)} mi
                         </div>
@@ -391,6 +416,9 @@ export function CoverMap({
               </Marker>
             );
           })}
+
+          {/* Distance scale overlay using Leaflet's built-in control */}
+          <LeafletScaleControl />
         </MapContainer>
       </div>
 

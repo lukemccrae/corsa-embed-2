@@ -13,6 +13,10 @@ interface ProfileLiveChatProps {
   hasMore?: boolean;
   /** Whether a load-more request is in-flight */
   loadingMore?: boolean;
+  /** Username for Corsa profile link */
+  username: string;
+  /** Stream ID for Corsa profile link */
+  streamId: string;
 }
 
 function formatChatTime(iso: string): string {
@@ -68,6 +72,8 @@ export function ProfileLiveChat({
   onLoadMore,
   hasMore = false,
   loadingMore = false,
+  username,
+  streamId,
 }: ProfileLiveChatProps) {
   // Reverse messages so newest is at the bottom
   const messages = [...initialMessages].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
@@ -95,7 +101,7 @@ export function ProfileLiveChat({
       <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-700">
         <i className="pi pi-comments text-red-500 text-sm" />
         <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
-          Live Chat
+          Chat
         </span>
         {isLive && (
           <span className="ml-auto flex items-center gap-1 text-xs text-red-400">
@@ -151,6 +157,17 @@ export function ProfileLiveChat({
           ))
         )}
         <div ref={bottomRef} />
+      </div>
+      {/* Corsa site link button */}
+      <div className="flex justify-center p-4 border-t border-gray-700 bg-gray-900">
+        <a
+          href={`https://www.corsa.run/profile/${username}/stream/${streamId}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block px-4 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded shadow transition-colors"
+        >
+          Visit Corsa to chat
+        </a>
       </div>
     </div>
   );

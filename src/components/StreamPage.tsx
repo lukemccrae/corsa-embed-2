@@ -361,6 +361,8 @@ export function StreamPage({
       {showChat && (
         <div className={`ce-section-card ${cardBg} border rounded-lg shadow-lg overflow-hidden`}>
           <ProfileLiveChat
+            username={username}
+            streamId={streamId}
             initialMessages={chatMessages}
             isLive={isLive}
             chatMaxHeight={chatMaxHeight}
