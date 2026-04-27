@@ -298,6 +298,7 @@ export function StreamPage({
           isLive={isLive}
           routeId={stream.route?.routeId ?? null}
           routeName={stream.route?.name ?? null}
+          bio={user.bio ?? null}
         />
       )}
 

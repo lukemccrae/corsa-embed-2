@@ -53,13 +53,13 @@ function ChatAvatar({
       <img
         src={getProfilePictureUrl({ profilePicture })}
         alt={username}
-        className="w-8 h-8 rounded-full object-cover flex-shrink-0 ring-1 ring-gray-700"
+        className="w-14 h-14 rounded-full object-cover flex-shrink-0 ring-2 ring-gray-700"
         onError={() => setImgError(true)}
       />
     );
   }
   return (
-    <div className="w-8 h-8 rounded-full flex-shrink-0 bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-300 ring-1 ring-gray-600">
+    <div className="w-14 h-14 rounded-full flex-shrink-0 bg-gray-700 flex items-center justify-center text-2xl font-extrabold text-gray-300 ring-2 ring-gray-600">
       {username?.charAt(0)?.toUpperCase() || "?"}
     </div>
   );
@@ -135,21 +135,21 @@ export function ProfileLiveChat({
           </p>
         ) : (
           messages.map((msg, i) => (
-            <div key={`${msg.createdAt}-${i}`} className="flex gap-2 items-start">
+            <div key={`${msg.createdAt}-${i}`} className="flex gap-4 items-start">
               <ChatAvatar
                 username={msg.publicUser?.username ?? "?"}
                 profilePicture={msg.publicUser?.profilePicture}
               />
               <div className="flex-1 min-w-0">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-sm font-semibold text-gray-200 truncate">
+                <div className="flex items-baseline gap-3">
+                  <span className="text-lg font-bold text-gray-200 truncate">
                     {msg.publicUser?.username ?? "Unknown"}
                   </span>
-                  <span className="text-xs text-gray-500 flex-shrink-0">
+                  <span className="text-base text-gray-400 flex-shrink-0">
                     {formatChatTime(msg.createdAt)}
                   </span>
                 </div>
-                <p className="text-sm text-gray-300 break-words leading-snug mt-0.5">
+                <p className="text-lg text-gray-300 break-words leading-snug mt-1">
                   {msg.text}
                 </p>
               </div>
@@ -164,7 +164,7 @@ export function ProfileLiveChat({
           href={`https://www.corsa.run/profile/${username}/stream/${streamId}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-block px-4 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded shadow transition-colors"
+          className="inline-block px-8 py-3 text-xl font-bold text-white bg-red-600 hover:bg-red-700 rounded shadow transition-colors"
         >
           Visit Corsa to chat
         </a>

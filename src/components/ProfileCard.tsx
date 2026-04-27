@@ -13,6 +13,7 @@ type LiveProfileCardProps = {
   isLive?: boolean;
   routeId?: string | null;
   routeName?: string | null;
+  bio?: string | null;
   onFollowClick?: () => void;
   showSettings?: boolean;
   onSettingsClick?: () => void;
@@ -28,6 +29,7 @@ export default function LiveProfileCard({
   // isLive,
   routeId,
   routeName,
+  bio,
   showSettings,
   onSettingsClick,
 }: LiveProfileCardProps) {
@@ -127,10 +129,10 @@ export default function LiveProfileCard({
             <img
               src={profilePicture}
               alt={username}
-              className="w-16 h-16 rounded-full object-cover overflow-hidden ring-2 ring-white dark:ring-gray-800"
+              className="w-32 h-32 rounded-full object-cover overflow-hidden ring-4 ring-white dark:ring-gray-800"
             />
           ) : (
-            <div className="w-16 h-16 rounded-full flex items-center justify-center bg-gray-300 dark:bg-gray-600 ring-2 ring-white dark:ring-gray-800 text-xl font-bold">
+            <div className="w-32 h-32 rounded-full flex items-center justify-center bg-gray-300 dark:bg-gray-600 ring-4 ring-white dark:ring-gray-800 text-5xl font-extrabold">
               {username?.charAt(0).toUpperCase()}
             </div>
           )}
@@ -142,7 +144,7 @@ export default function LiveProfileCard({
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <h2
-                  className={`text-lg font-bold ${textColor} truncate`}
+                  className={`text-4xl font-extrabold ${textColor} truncate`}
                 >
                   {username}
                 </h2>
@@ -164,9 +166,14 @@ export default function LiveProfileCard({
                   </span>
                 )} */}
               </div>
-              <p className={`text-sm ${mutedColor} truncate`}>
+              <p className={`text-lg ${mutedColor} truncate`}>
                 {streamTitle || "Live Stream"}
               </p>
+              {bio && (
+                <p className={`mt-2 text-lg text-gray-400 dark:text-gray-300 break-words max-w-full`}>
+                  {bio}
+                </p>
+              )}
               {routeId && (
                 <div className="inline-flex items-center gap-1 mt-1 text-sm text-blue-500">
                   <i className="pi pi-map text-xs" />
@@ -188,7 +195,7 @@ export default function LiveProfileCard({
           {/* Stats row */}
           {startTime && (
             <div
-              className={`flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-sm ${mutedColor}`}
+              className={`flex flex-wrap items-center gap-x-6 gap-y-2 mt-4 text-lg ${mutedColor}`}
             >
               <div className="flex items-center gap-1">
                 <i className="pi pi-clock text-xs" />
