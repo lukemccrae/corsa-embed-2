@@ -1,4 +1,3 @@
-// @ts-nocheck - Generated file; TypeScript checking disabled to allow enums under erasableSyntaxOnly.
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -37,6 +36,26 @@ export type BlogPost = Post & {
 
 /**
  *   -----------------------
+ *  Business + Embeds
+ *  -----------------------
+ */
+export type Business = {
+  __typename?: 'Business';
+  businessId: Scalars['ID']['output'];
+  createdAt?: Maybe<Scalars['AWSDateTime']['output']>;
+  embeds: Array<Embed>;
+  name: Scalars['String']['output'];
+  ownerUserId: Scalars['ID']['output'];
+  updatedAt?: Maybe<Scalars['AWSDateTime']['output']>;
+};
+
+export type BusinessInput = {
+  businessId?: InputMaybe<Scalars['ID']['input']>;
+  name: Scalars['String']['input'];
+};
+
+/**
+ *   -----------------------
  *  ChatMessage
  *  -----------------------
  */
@@ -47,6 +66,17 @@ export type ChatMessage = {
   streamId: Scalars['ID']['output'];
   text: Scalars['String']['output'];
   userId: Scalars['ID']['output'];
+};
+
+/**
+ *   -----------------------
+ *  LiveStream
+ *  -----------------------
+ */
+export type ChatMessageConnection = {
+  __typename?: 'ChatMessageConnection';
+  items: Array<ChatMessage>;
+  nextToken?: Maybe<Scalars['String']['output']>;
 };
 
 export type ChatMessageInput = {
@@ -98,6 +128,12 @@ export type DeleteDeviceResponse = {
   success: Scalars['Boolean']['output'];
 };
 
+export type DeleteEmbedResponse = {
+  __typename?: 'DeleteEmbedResponse';
+  message?: Maybe<Scalars['String']['output']>;
+  success: Scalars['Boolean']['output'];
+};
+
 export type DeleteRouteInput = {
   createdAt: Scalars['AWSDateTime']['input'];
   routeId: Scalars['ID']['input'];
@@ -116,6 +152,16 @@ export type DeleteStreamInput = {
 
 export type DeleteStreamResponse = {
   __typename?: 'DeleteStreamResponse';
+  message?: Maybe<Scalars['String']['output']>;
+  success: Scalars['Boolean']['output'];
+};
+
+export type DeleteUserInput = {
+  userId: Scalars['ID']['input'];
+};
+
+export type DeleteUserResponse = {
+  __typename?: 'DeleteUserResponse';
   message?: Maybe<Scalars['String']['output']>;
   success: Scalars['Boolean']['output'];
 };
@@ -186,6 +232,44 @@ export type DeviceVerificationSession = {
   verificationStreamId: Scalars['String']['output'];
 };
 
+export type Embed = {
+  __typename?: 'Embed';
+  businessId: Scalars['ID']['output'];
+  createdAt?: Maybe<Scalars['AWSDateTime']['output']>;
+  embedId: Scalars['ID']['output'];
+  enabled: Scalars['Boolean']['output'];
+  livestream?: Maybe<LiveStream>;
+  livestreamId: Scalars['ID']['output'];
+  name?: Maybe<Scalars['String']['output']>;
+  publicId: Scalars['ID']['output'];
+  settings?: Maybe<EmbedSettings>;
+  updatedAt?: Maybe<Scalars['AWSDateTime']['output']>;
+};
+
+export type EmbedInput = {
+  businessId: Scalars['ID']['input'];
+  embedId?: InputMaybe<Scalars['ID']['input']>;
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  livestreamId: Scalars['ID']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+  settings?: InputMaybe<EmbedSettingsInput>;
+};
+
+export type EmbedSettings = {
+  __typename?: 'EmbedSettings';
+  showChat?: Maybe<Scalars['Boolean']['output']>;
+  showHeader?: Maybe<Scalars['Boolean']['output']>;
+  showSponsors?: Maybe<Scalars['Boolean']['output']>;
+  theme?: Maybe<Scalars['String']['output']>;
+};
+
+export type EmbedSettingsInput = {
+  showChat?: InputMaybe<Scalars['Boolean']['input']>;
+  showHeader?: InputMaybe<Scalars['Boolean']['input']>;
+  showSponsors?: InputMaybe<Scalars['Boolean']['input']>;
+  theme?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type FullDataWaypoint = {
   __typename?: 'FullDataWaypoint';
   cumulativeGain?: Maybe<Scalars['Float']['output']>;
@@ -211,17 +295,14 @@ export type LatLngInput = {
   lng: Scalars['Float']['input'];
 };
 
-/**
- *   -----------------------
- *  LiveStream
- *  -----------------------
- */
 export type LiveStream = {
   __typename?: 'LiveStream';
-  chatMessages?: Maybe<Array<Maybe<ChatMessage>>>;
+  chatMessages?: Maybe<ChatMessageConnection>;
   currentLocation?: Maybe<LatLng>;
   currentPointIndex?: Maybe<Scalars['Int']['output']>;
   delayInSeconds?: Maybe<Scalars['Int']['output']>;
+  deleted?: Maybe<Scalars['Boolean']['output']>;
+  deletedAt?: Maybe<Scalars['AWSDateTime']['output']>;
   device?: Maybe<Device>;
   entity?: Maybe<Scalars['String']['output']>;
   finishTime?: Maybe<Scalars['String']['output']>;
@@ -239,6 +320,13 @@ export type LiveStream = {
   title: Scalars['String']['output'];
   unitOfMeasure?: Maybe<UnitOfMeasure>;
   waypoints?: Maybe<Array<Maybe<Waypoint>>>;
+  waypointsPrivate?: Maybe<Scalars['Boolean']['output']>;
+};
+
+
+export type LiveStreamChatMessagesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  nextToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type LiveStreamInput = {
@@ -304,15 +392,19 @@ export type Mutation = {
   createUserImageUploadUrl: PresignedUrlResponse;
   deleteChat: DeleteChatResponse;
   deleteDevice: DeleteDeviceResponse;
+  deleteEmbed: DeleteEmbedResponse;
   deleteRoute: DeleteRouteResponse;
   deleteStream: DeleteStreamResponse;
+  deleteUser: DeleteUserResponse;
   deleteWaypoint: DeleteWaypointResponse;
   publishChat: ChatMessage;
   publishWaypoint: Waypoint;
   recalibrateRoute: Route;
   startDeviceVerification: DeviceVerificationSession;
   updateUserImages: User;
+  upsertBusiness: Business;
   upsertDevice: Device;
+  upsertEmbed: Embed;
   upsertLiveStream: LiveStreamSuccessResponse;
   upsertPost: Post;
   upsertRoute: Route;
@@ -352,6 +444,12 @@ export type MutationDeleteDeviceArgs = {
 };
 
 
+export type MutationDeleteEmbedArgs = {
+  businessId: Scalars['ID']['input'];
+  embedId: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteRouteArgs = {
   input: DeleteRouteInput;
 };
@@ -359,6 +457,11 @@ export type MutationDeleteRouteArgs = {
 
 export type MutationDeleteStreamArgs = {
   input: DeleteStreamInput;
+};
+
+
+export type MutationDeleteUserArgs = {
+  input: DeleteUserInput;
 };
 
 
@@ -392,8 +495,18 @@ export type MutationUpdateUserImagesArgs = {
 };
 
 
+export type MutationUpsertBusinessArgs = {
+  input: BusinessInput;
+};
+
+
 export type MutationUpsertDeviceArgs = {
   input: DeviceInput;
+};
+
+
+export type MutationUpsertEmbedArgs = {
+  input: EmbedInput;
 };
 
 
@@ -515,7 +628,9 @@ export type PublicUser = {
 
 export type Query = {
   __typename?: 'Query';
+  getBusinessByBusinessId?: Maybe<Business>;
   getDeviceByImei?: Maybe<Device>;
+  getEmbedByPublicId?: Maybe<Embed>;
   getRoutesByEntity?: Maybe<Array<Maybe<Route>>>;
   getStreamsByEntity?: Maybe<Array<Maybe<LiveStream>>>;
   getUserByUserId?: Maybe<User>;
@@ -523,8 +638,18 @@ export type Query = {
 };
 
 
+export type QueryGetBusinessByBusinessIdArgs = {
+  businessId: Scalars['ID']['input'];
+};
+
+
 export type QueryGetDeviceByImeiArgs = {
   imei: Scalars['ID']['input'];
+};
+
+
+export type QueryGetEmbedByPublicIdArgs = {
+  publicId: Scalars['ID']['input'];
 };
 
 
@@ -548,11 +673,43 @@ export type QueryGetUserByUserNameArgs = {
 };
 
 export type RecalibrateRouteInput = {
+  anchors?: InputMaybe<Array<RouteMileageAnchorInput>>;
   createdAt: Scalars['AWSDateTime']['input'];
   routeId: Scalars['ID']['input'];
   targetDistanceInMiles: Scalars['Float']['input'];
   targetGainInFeet: Scalars['Int']['input'];
   userId: Scalars['ID']['input'];
+};
+
+/**
+ *   =============================================================
+ *  REST Ingestion Types
+ *  These types are used exclusively by REST API endpoints (not
+ *  AppSync mutations/queries). They are included here so that
+ *  GraphQL Codegen can emit matching TypeScript types for both
+ *  the native app clients and the backend lambdas that service
+ *  these REST endpoints.
+ *  =============================================================
+ *  -- REST: POST /native-waypoint --
+ *  Request body sent by the native app to ingest a single waypoint.
+ */
+export type RestWaypointIngestInput = {
+  lat: Scalars['Float']['input'];
+  lng: Scalars['Float']['input'];
+  streamId: Scalars['ID']['input'];
+  timestamp?: InputMaybe<Scalars['AWSDateTime']['input']>;
+};
+
+/**   Response returned by POST /native-waypoint. */
+export type RestWaypointIngestResponse = {
+  __typename?: 'RestWaypointIngestResponse';
+  cumulativeVert?: Maybe<Scalars['Float']['output']>;
+  mileMarker?: Maybe<Scalars['Float']['output']>;
+  ok: Scalars['Boolean']['output'];
+  pointIndex?: Maybe<Scalars['Int']['output']>;
+  snapped: Scalars['Boolean']['output'];
+  streamId: Scalars['ID']['output'];
+  timestamp: Scalars['AWSDateTime']['output'];
 };
 
 export type Route = {
@@ -586,6 +743,12 @@ export type RouteInput = {
   storagePath: Scalars['String']['input'];
   uom: UnitOfMeasure;
   userId: Scalars['ID']['input'];
+};
+
+export type RouteMileageAnchorInput = {
+  lat: Scalars['Float']['input'];
+  lng: Scalars['Float']['input'];
+  mile: Scalars['Float']['input'];
 };
 
 export enum RouteProcessingStatus {
@@ -657,7 +820,10 @@ export type UpdateUserImagesInput = {
 export type User = {
   __typename?: 'User';
   bio?: Maybe<Scalars['String']['output']>;
+  businessId?: Maybe<Scalars['ID']['output']>;
   coverImagePath?: Maybe<Scalars['String']['output']>;
+  deleted?: Maybe<Scalars['Boolean']['output']>;
+  deletedAt?: Maybe<Scalars['AWSDateTime']['output']>;
   devices?: Maybe<Array<Maybe<Device>>>;
   live?: Maybe<Scalars['Boolean']['output']>;
   liveStreams?: Maybe<Array<Maybe<LiveStream>>>;
@@ -742,4 +908,5 @@ export type WaypointInput = {
   private?: InputMaybe<Scalars['Boolean']['input']>;
   streamId: Scalars['ID']['input'];
   timestamp: Scalars['AWSDateTime']['input'];
+  waypointsPrivate?: InputMaybe<Scalars['Boolean']['input']>;
 };
