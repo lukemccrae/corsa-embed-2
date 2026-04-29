@@ -5,23 +5,17 @@ import App from "./App";
 /**
  * Auto-mount logic:
  *
- * Finds the <script> tag that loaded this bundle, reads data attributes,
- * creates a container div immediately after the script tag, and mounts
- * the React app.
+ * Finds the <script> tag that loaded this bundle, reads the
+ * `data-corsa-public-id` attribute, and mounts the React app.
+ * All embed configuration (settings, theme, username, streamId) is
+ * fetched internally via getEmbedByPublicId — the host page only
+ * needs to supply the publicId.
  *
- * Stream embed example:
+ * Embed example:
  *   <script
- *     src="https://your-cdn/bundle.js"
- *     data-username="luke"
- *     data-stream-id="abc123"
- *   ></script>
- *
- * Route embed example:
- *   <script
- *     src="https://your-cdn/bundle.js"
- *     data-username="luke"
- *     data-route-id="route456"
- *     data-view="route"
+ *     src="https://your-cdn/corsa-bundle.js"
+ *     data-corsa-public-id="e3fcce22-6c1a-49af-ab63-df4850086b77"
+ *     async
  *   ></script>
  */
 function mount() {
@@ -32,7 +26,7 @@ function mount() {
     (document.currentScript as HTMLScriptElement | null) ??
     [
       ...document.querySelectorAll<HTMLScriptElement>(
-        "script[data-username]"
+        "script[data-corsa-public-id]"
       ),
     ].at(-1);
 
@@ -41,47 +35,12 @@ function mount() {
     return;
   }
 
-  const username = scriptEl.dataset.username;
-  const streamId = scriptEl.dataset.streamId;
-  const routeId = scriptEl.dataset.routeId;
-  const view = scriptEl.dataset.view as "stream" | "route" | undefined;
+  const publicId = scriptEl.dataset.corsaPublicId;
   const mountSelector = scriptEl.dataset.mount;
 
-  // Resolve feedMaxHeight: data-max-height attr > window config > default (600)
-  const runtimeConfig = (window as Window & { __CORSA_EMBED_CONFIG__?: { 
-    feedMaxHeight?: number;
-    chatMaxHeight?: number;
-    components?: {
-      map?: boolean;
-      posts?: boolean;
-      elevation?: boolean;
-      route?: boolean;
-      profile?: boolean;
-      chat?: boolean;
-    };
-  } }).__CORSA_EMBED_CONFIG__;
-  const feedMaxHeight =
-    scriptEl.dataset.maxHeight !== undefined
-      ? Number(scriptEl.dataset.maxHeight)
-      : runtimeConfig?.feedMaxHeight ?? 600;
-  const chatMaxHeight =
-    scriptEl.dataset.chatMaxHeight !== undefined
-      ? Number(scriptEl.dataset.chatMaxHeight)
-      : runtimeConfig?.chatMaxHeight ?? 420;
-  
-  // Extract component visibility settings
-  const components = runtimeConfig?.components ?? {};
-
-  if (!username) {
+  if (!publicId) {
     console.error(
-      "[CorsaEmbed] Missing data-username attribute on the <script> tag."
-    );
-    return;
-  }
-
-  if (!streamId && !routeId) {
-    console.error(
-      "[CorsaEmbed] Missing data-stream-id or data-route-id on the <script> tag."
+      "[CorsaEmbed] Missing data-corsa-public-id attribute on the <script> tag."
     );
     return;
   }
@@ -99,7 +58,7 @@ function mount() {
     }
   } else {
     container = document.createElement("div");
-    container.id = `corsa-embed-${streamId ?? routeId}`;
+    container.id = `corsa-embed-${publicId}`;
     container.className = "corsa-embed-container";
     container.style.width = "100%";
     container.style.boxSizing = "border-box";
@@ -108,15 +67,7 @@ function mount() {
 
   createRoot(container).render(
     <React.StrictMode>
-      <App
-        username={username}
-        streamId={streamId}
-        routeId={routeId}
-        view={view}
-        feedMaxHeight={feedMaxHeight}
-        chatMaxHeight={chatMaxHeight}
-        components={components}
-      />
+      <App publicId={publicId} />
     </React.StrictMode>
   );
 }
@@ -125,20 +76,7 @@ function mount() {
 interface MountOptions {
   elementId?: string;
   container?: HTMLElement;
-  username: string;
-  streamId?: string;
-  routeId?: string;
-  view?: "stream" | "route";
-  feedMaxHeight?: number;
-  chatMaxHeight?: number;
-  components?: {
-    map?: boolean;
-    posts?: boolean;
-    elevation?: boolean;
-    route?: boolean;
-    profile?: boolean;
-    chat?: boolean;
-  };
+  publicId: string;
 }
 
 function mountTo(options: MountOptions) {
@@ -153,15 +91,7 @@ function mountTo(options: MountOptions) {
 
   createRoot(el).render(
     <React.StrictMode>
-      <App
-        username={options.username}
-        streamId={options.streamId}
-        routeId={options.routeId}
-        view={options.view}
-        feedMaxHeight={options.feedMaxHeight}
-        chatMaxHeight={options.chatMaxHeight}
-        components={options.components}
-      />
+      <App publicId={options.publicId} />
     </React.StrictMode>
   );
 }
@@ -173,3 +103,4 @@ function mountTo(options: MountOptions) {
 
 // Auto-mount when the script runs
 mount();
+

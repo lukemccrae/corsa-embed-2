@@ -6,6 +6,7 @@ import type {
   Post,
   ChatMessage,
 } from "../generated/schema";
+import type { EmbedSettings } from "../types";
 import { appsyncRequest } from "../helpers/appsync.helper";
 import { appsyncSubscribe } from "../helpers/appsync-subscription.helper";
 import {
@@ -31,15 +32,8 @@ interface StreamPageProps {
   feedMaxHeight?: number;
   /** Maximum height (px) of the chat scroll area. Default: 420 */
   chatMaxHeight?: number;
-  /** Component visibility settings */
-  components?: {
-    map?: boolean;
-    posts?: boolean;
-    elevation?: boolean;
-    route?: boolean;
-    profile?: boolean;
-    chat?: boolean;
-  };
+  /** Embed settings fetched from getEmbedByPublicId */
+  embedSettings?: EmbedSettings;
 }
 
 /** AppSync returns chatMessages as a connection with items + nextToken */
@@ -71,7 +65,7 @@ export function StreamPage({
   streamId,
   feedMaxHeight = 600,
   chatMaxHeight = 420,
-  components = {},
+  embedSettings,
 }: StreamPageProps) {
   const { apiToken, isReady, error: authError } = useUser();
   const { theme } = useTheme();
@@ -85,12 +79,14 @@ export function StreamPage({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Default all components to visible if not explicitly set
-  const showMap = components.map !== false;
-  const showPosts = components.posts !== false;
-  const showElevation = components.elevation !== false;
-  const showProfile = components.profile !== false;
-  const showChat = components.chat !== false;
+  // Map embed settings to component visibility.
+  // showHeader controls the profile card, showChat controls the chat panel.
+  // Map, posts, and elevation are shown by default (not controlled by embed settings).
+  const showMap = true;
+  const showPosts = true;
+  const showElevation = true;
+  const showProfile = embedSettings?.showHeader !== false;
+  const showChat = embedSettings?.showChat !== false;
 
   const cardBg = isDark
     ? "bg-gray-900/95 border-gray-700"

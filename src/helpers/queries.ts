@@ -154,6 +154,37 @@ export const STREAM_CHAT_PAGE_QUERY = (
 `;
 
 /**
+ * Fetches embed configuration by publicId, including livestream data.
+ * Used by the embed bundle to self-configure without host-page settings.
+ */
+export const GET_EMBED_BY_PUBLIC_ID = (publicId: string) => /* GraphQL */ `
+  query GetEmbedByPublicId {
+    getEmbedByPublicId(publicId: "${publicId}") {
+      businessId
+      embedId
+      enabled
+      livestreamId
+      name
+      settings {
+        showChat
+        showHeader
+        showSponsors
+        theme
+      }
+      livestream {
+        delayInSeconds
+        publicUser {
+          username
+          profilePicture
+          bio
+          userId
+        }
+      }
+    }
+  }
+`;
+
+/**
  * Fetches route metadata for a given user, used by the route embed.
  * Pass the routeId to filter the desired route on the client side.
  */

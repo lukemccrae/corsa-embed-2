@@ -43,65 +43,48 @@ All TypeScript types are sourced from `src/generated/schema.ts` (generated via G
 
 ## Embedding
 
-### Recommended embed snippet
+### New embed API
 
-Use a wrapper `<div>` to control the embed's dimensions. The embed will fill its
-container 100 % horizontally and grow vertically to fit its content.
+The embed self-configures by fetching its settings from the Corsa API using
+a `publicId`. The host page only needs a single `<script>` tag — no
+`window.__CORSA_EMBED_CONFIG__` block is required.
 
 ```html
-<!-- 1. Optional runtime config (must appear before bundle.js) -->
-<script>
-  window.__CORSA_EMBED_CONFIG__ = {
-    feedMaxHeight: 600,           // px – max height of the scrollable posts list
-    components: {                 // toggle individual sections on/off
-      map: true,
-      posts: true,
-      elevation: true,
-      route: true,
-      profile: true
-    }
-  };
-</script>
-
-<!-- 2. Size the embed via a wrapper div, then load the bundle -->
+<!-- Load the embed bundle and point it at your embed's publicId -->
 <div style="width: 100%; max-width: 1200px;">
   <script
-    src="https://your-cdn/bundle.js"
-    data-username="alice"
-    data-stream-id="stream-123"
+    src="https://your-cdn/corsa-bundle.js"
+    data-corsa-public-id="e3fcce22-6c1a-49af-ab63-df4850086b77"
+    async
   ></script>
 </div>
 ```
 
-The bundle inserts a `<div class="corsa-embed-container">` immediately after the
-`<script>` tag and mounts the React app into it. That container is `width: 100%`
-by default, so it fills whatever wrapper you provide.
+The bundle reads `data-corsa-public-id`, fetches embed configuration (including
+theme, chat visibility, header, and the associated livestream) from the Corsa
+GraphQL API, and renders accordingly. All GraphQL endpoint and Firebase auth
+details are bundled inside the JS — the host page is not required to provide
+any configuration.
 
-#### Controlling height
+#### Embed settings (controlled in the Corsa dashboard)
 
-The embed sizes itself to its content by default. To cap the overall height of
-the widget, wrap it in a fixed-height div with `overflow: hidden` (or
-`overflow: auto`):
-
-```html
-<div style="width: 100%; max-width: 1200px; height: 700px; overflow: hidden;">
-  <script src="bundle.js" data-username="alice" data-stream-id="stream-123"></script>
-</div>
-```
+| Setting | Effect |
+|---|---|
+| `showChat` | Show or hide the live chat panel |
+| `showHeader` | Show or hide the profile/stream header card |
+| `showSponsors` | Show or hide sponsor information |
+| `theme` | `"dark"` or `"light"` — applied to the entire embed |
 
 #### Mounting into an existing element (`data-mount`)
-
-If you prefer to mount the embed into a pre-existing element on the page, add
-the `data-mount` attribute with a CSS selector:
 
 ```html
 <div id="my-embed" style="width: 800px;"></div>
 
 <script
   src="bundle.js"
-  data-username="alice"
-  data-stream-id="stream-123"
+  data-corsa-public-id="your-public-id"
   data-mount="#my-embed"
+  async
 ></script>
 ```
 
@@ -114,13 +97,17 @@ the `data-mount` attribute with a CSS selector:
 <script>
   CorsaEmbed.mount({
     elementId: 'my-embed',
-    username: 'alice',
-    streamId: 'stream-123',
-    feedMaxHeight: 500,
-    components: { map: true, posts: true, elevation: true }
+    publicId: 'e3fcce22-6c1a-49af-ab63-df4850086b77'
   });
 </script>
 ```
+
+#### Error handling
+
+- If `data-corsa-public-id` is missing, the bundle logs a console error and
+  does not mount.
+- If the GraphQL request fails or returns `null`, a user-visible error message
+  is rendered inside the embed container.
 
 ### Responsive layout
 

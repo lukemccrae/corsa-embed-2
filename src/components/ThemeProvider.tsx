@@ -28,23 +28,31 @@ export const useTheme = () => {
  */
 export default function ThemeProvider({
   children,
+  initialTheme,
 }: {
   children: React.ReactNode;
+  /** Optional theme override from embed configuration. Takes priority over localStorage. */
+  initialTheme?: "light" | "dark";
 }) {
   // Stable server-side default (do NOT access window/localStorage here)
   const [theme, setThemeState] = useState<Theme>("dark");
 
-  // On mount, read persisted user preference or system preference and apply it.
+  // On mount, apply initialTheme prop (from embed settings) if provided,
+  // otherwise fall back to persisted user preference or system preference.
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const saved = localStorage.getItem("theme");
     let initial: Theme = "dark";
 
-    if (saved === "dark" || saved === "light") {
-      initial = saved as Theme;
-    } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      initial = "dark";
+    if (initialTheme === "dark" || initialTheme === "light") {
+      initial = initialTheme;
+    } else {
+      const saved = localStorage.getItem("theme");
+      if (saved === "dark" || saved === "light") {
+        initial = saved as Theme;
+      } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        initial = "dark";
+      }
     }
 
     // Only update state if it differs from the current state to avoid an unnecessary render.
