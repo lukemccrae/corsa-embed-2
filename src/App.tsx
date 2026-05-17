@@ -11,8 +11,6 @@ interface AppProps {
   streamId?: string;
   /** routeId for route embed mode */
   routeId?: string;
-  /** Device make for branding (e.g. "GARMIN" or "SPOT") */
-  deviceMake?: string;
   /** "stream" (default) | "route" */
   view?: "stream" | "route";
   /** Maximum height (px) for the feed/posts scroll area. Default: 600 */
@@ -32,7 +30,6 @@ interface AppProps {
 
 export default function App({
   username,
-  deviceMake,
   streamId,
   routeId,
   view,
@@ -51,7 +48,6 @@ export default function App({
             {resolvedView === "route" && routeId ? (
               <RoutePage
                 username={username}
-                deviceMake={deviceMake}
                 routeId={routeId}
                 components={components}
               />
