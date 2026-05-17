@@ -35,27 +35,6 @@ function LeafletScaleControl() {
   return null;
 }
 
-// CORSA branding control in bottom-left corner
-function CorsaBrandingControl() {
-  const map = useMap();
-  useEffect(() => {
-    const BrandingControl = L.Control.extend({
-      options: { position: "bottomleft" },
-      onAdd() {
-        const div = L.DomUtil.create("div", "ce-map-branding");
-        div.innerHTML = `<span class="ce-map-branding-text">CORSA</span>`;
-        L.DomEvent.disableClickPropagation(div);
-        return div;
-      },
-    });
-    const control = new (BrandingControl as new () => L.Control)();
-    control.addTo(map);
-    return () => {
-      control.remove();
-    };
-  }, [map]);
-  return null;
-}
 
 // Fix Leaflet default icon resolution (no bundler plugin needed)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -254,10 +233,10 @@ export function CoverMap({
             <Polyline
               positions={routePositions}
               pathOptions={{
-                color: "#6366f1",
+                color: "#000",
                 weight: 3,
-                opacity: 0.6,
-                dashArray: "6 4",
+                opacity: 0.9,
+                dashArray: undefined,
               }}
             />
           )}
@@ -266,7 +245,7 @@ export function CoverMap({
           {waypointPositions.length > 1 && (
             <Polyline
               positions={waypointPositions}
-              pathOptions={{ color: "#ef4444", weight: 4, opacity: 0.9 }}
+              pathOptions={{ color: "#000", weight: 4, opacity: 0.9 }}
             />
           )}
 
@@ -285,26 +264,26 @@ export function CoverMap({
               <CircleMarker
                 key={`wp-dot-${idx}`}
                 center={[w.lat, w.lng]}
-                radius={4}
+                radius={5}
                 pathOptions={{
                   color: "#fff",
-                  fillColor: "#ef4444",
+                  fillColor: "#000",
                   fillOpacity: 1,
-                  weight: 1.5,
+                  weight: 2,
                 }}
               >
                 <Popup>
                   <div className="ce-wp-popup">
-                    {routeGeoJson && w.mileMarker != null && (
+                    {w.mileMarker != null && (
                       <div className="ce-wp-popup-row">
                         <span className="ce-wp-popup-label">Distance</span>
                         <span className="ce-wp-popup-value">{w.mileMarker.toFixed(2)} mi</span>
                       </div>
                     )}
-                    {w.altitude != null && (
+                    {w.cumulativeVert != null && (
                       <div className="ce-wp-popup-row">
-                        <span className="ce-wp-popup-label">Altitude</span>
-                        <span className="ce-wp-popup-value">{Math.round(w.altitude)} ft</span>
+                        <span className="ce-wp-popup-label">Gain</span>
+                        <span className="ce-wp-popup-value">{Math.round(w.cumulativeVert)} ft</span>
                       </div>
                     )}
                     {elapsed && (
@@ -461,8 +440,6 @@ export function CoverMap({
             );
           })}
 
-          {/* CORSA branding bottom-left and distance scale bottom-right */}
-          <CorsaBrandingControl />
           {/* Distance scale overlay using Leaflet's built-in control */}
           <LeafletScaleControl />
         </MapContainer>

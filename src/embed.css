@@ -293,12 +293,13 @@
 }
 
 /* Post markers on the map */
+
 .ce-post-marker {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: #1e1e1e;
-  border: 2px solid #4fc3f7;
+  background: #000;
+  border: 2px solid #fff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -313,7 +314,7 @@
 
 .ce-post-marker .pi {
   font-size: 13px;
-  color: #4fc3f7;
+  color: #fff;
 }
 
 .ce-post-marker--image {
