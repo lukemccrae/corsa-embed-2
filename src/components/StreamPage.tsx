@@ -325,6 +325,7 @@ export function StreamPage({
                   isLive={isLive}
                   wrapperClassName="ce-map-responsive"
                   posts={posts}
+                  profilePicture={getProfilePictureUrl({ profilePicture: user.profilePicture })}
                 />
               </div>
             )}

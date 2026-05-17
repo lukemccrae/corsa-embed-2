@@ -16,7 +16,7 @@ import { getPostImageUrl } from "../utils/userImages";
 
 
 
-// Leaflet scale control as a React component
+// Leaflet scale control in bottom-right corner
 function LeafletScaleControl() {
   const map = useMap();
   useEffect(() => {
@@ -25,10 +25,33 @@ function LeafletScaleControl() {
       metric: true,
       imperial: true,
       updateWhenIdle: false,
+      position: "bottomright",
     });
     scale.addTo(map);
     return () => {
       scale.remove();
+    };
+  }, [map]);
+  return null;
+}
+
+// CORSA branding control in bottom-left corner
+function CorsaBrandingControl() {
+  const map = useMap();
+  useEffect(() => {
+    const BrandingControl = L.Control.extend({
+      options: { position: "bottomleft" },
+      onAdd() {
+        const div = L.DomUtil.create("div", "ce-map-branding");
+        div.innerHTML = `<span class="ce-map-branding-text">CORSA</span>`;
+        L.DomEvent.disableClickPropagation(div);
+        return div;
+      },
+    });
+    const control = new (BrandingControl as new () => L.Control)();
+    control.addTo(map);
+    return () => {
+      control.remove();
     };
   }, [map]);
   return null;
@@ -100,6 +123,8 @@ export interface CoverMapProps {
    * from the class (useful for container-query-driven responsive heights).
    */
   wrapperClassName?: string;
+  /** Athlete profile picture URL – used for the live position marker */
+  profilePicture?: string | null;
 }
 
 export function CoverMap({
@@ -109,6 +134,7 @@ export function CoverMap({
   height = 360,
   posts = [],
   wrapperClassName,
+  profilePicture,
 }: CoverMapProps) {
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
 
@@ -187,6 +213,17 @@ export function CoverMap({
       iconAnchor: [24, 24],
       popupAnchor: [0, -24  ],
     });
+
+  // Profile photo DivIcon for the live tracker position
+  const profileMarkerIcon = profilePicture
+    ? L.divIcon({
+        className: "",
+        html: `<div class="ce-profile-map-marker" style="background-image: url('${encodeURI(profilePicture)}');"></div>`,
+        iconSize: [44, 44],
+        iconAnchor: [22, 22],
+        popupAnchor: [0, -24],
+      })
+    : null;
 
 
   return (
@@ -282,18 +319,25 @@ export function CoverMap({
             );
           })}
 
-          {/* Live tracker dot at current position */}
+          {/* Live tracker: profile photo marker (or fallback circle) at current position */}
           {trackerPos && isLive && (
-            <CircleMarker
-              center={trackerPos}
-              radius={8}
-              pathOptions={{
-                color: "#fff",
-                fillColor: "#ef4444",
-                fillOpacity: 1,
-                weight: 2,
-              }}
-            />
+            profileMarkerIcon ? (
+              <Marker
+                position={trackerPos}
+                icon={profileMarkerIcon}
+              />
+            ) : (
+              <CircleMarker
+                center={trackerPos}
+                radius={8}
+                pathOptions={{
+                  color: "#fff",
+                  fillColor: "#ef4444",
+                  fillOpacity: 1,
+                  weight: 2,
+                }}
+              />
+            )
           )}
 
           {/* Start/end markers when not live */}
@@ -417,6 +461,8 @@ export function CoverMap({
             );
           })}
 
+          {/* CORSA branding bottom-left and distance scale bottom-right */}
+          <CorsaBrandingControl />
           {/* Distance scale overlay using Leaflet's built-in control */}
           <LeafletScaleControl />
         </MapContainer>
