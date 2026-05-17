@@ -1,6 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ChatMessage } from "../generated/schema";
 import { getProfilePictureUrl } from "../utils/userImages";
+import { useTheme } from "./ThemeProvider";
 
 interface ProfileLiveChatProps {
   initialMessages: ChatMessage[];
@@ -37,8 +38,6 @@ function formatChatTime(iso: string): string {
   }
 }
 
-import { useState } from "react";
-
 function ChatAvatar({
   username,
   profilePicture,
@@ -53,13 +52,13 @@ function ChatAvatar({
       <img
         src={getProfilePictureUrl({ profilePicture })}
         alt={username}
-        className="w-14 h-14 rounded-full object-cover flex-shrink-0 ring-2 ring-gray-700"
+        className="w-10 h-10 rounded-full object-cover flex-shrink-0 ring-1 ring-white/10"
         onError={() => setImgError(true)}
       />
     );
   }
   return (
-    <div className="w-14 h-14 rounded-full flex-shrink-0 bg-gray-700 flex items-center justify-center text-2xl font-extrabold text-gray-300 ring-2 ring-gray-600">
+    <div className="w-10 h-10 rounded-full flex-shrink-0 bg-gray-700 flex items-center justify-center text-sm font-bold text-gray-200 ring-1 ring-white/10">
       {username?.charAt(0)?.toUpperCase() || "?"}
     </div>
   );
@@ -75,6 +74,14 @@ export function ProfileLiveChat({
   username,
   streamId,
 }: ProfileLiveChatProps) {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
+  const surface = isDark ? "bg-gray-950 text-gray-200" : "bg-gray-50 text-gray-800";
+  const borderColor = isDark ? "border-gray-800" : "border-gray-200";
+  const subtleText = isDark ? "text-gray-400" : "text-gray-500";
+  const bodyText = isDark ? "text-gray-200" : "text-gray-800";
+
   // Reverse messages so newest is at the bottom
   const messages = [...initialMessages].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -96,15 +103,15 @@ export function ProfileLiveChat({
   }, [messages]);
 
   return (
-    <div className="flex flex-col">
+    <div className={`flex flex-col ${surface}`}>
       {/* Header */}
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-700">
+      <div className={`ce-section-header ${borderColor}`}>
         <i className="pi pi-comments text-red-500 text-sm" />
-        <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
+        <span className="ce-section-title">
           Chat
         </span>
         {isLive && (
-          <span className="ml-auto flex items-center gap-1 text-xs text-red-400">
+          <span className="ml-auto inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-red-400">
             <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
             Live
           </span>
@@ -117,7 +124,7 @@ export function ProfileLiveChat({
           <button
             onClick={onLoadMore}
             disabled={loadingMore}
-            className="text-xs text-gray-400 hover:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed border border-gray-700 rounded px-3 py-1 transition-colors"
+            className={`text-[11px] font-medium ${subtleText} hover:text-red-400 disabled:opacity-50 disabled:cursor-not-allowed border ${borderColor} rounded-full px-3 py-1 transition-colors`}
           >
             {loadingMore ? "Loading…" : "Load older messages"}
           </button>
@@ -126,30 +133,30 @@ export function ProfileLiveChat({
 
       {/* Messages */}
       <div
-        className="overflow-y-auto px-4 py-3 space-y-3"
+        className="ce-chat-scroll overflow-y-auto px-4 py-3 space-y-3"
         style={{ maxHeight: chatMaxHeight, overscrollBehavior: "contain" }}
       >
         {messages.length === 0 ? (
-          <p className="text-gray-500 text-sm text-center py-4">
+          <p className={`${subtleText} text-sm text-center py-4`}>
             No messages yet.
           </p>
         ) : (
           messages.map((msg, i) => (
-            <div key={`${msg.createdAt}-${i}`} className="flex gap-4 items-start">
+            <div key={`${msg.createdAt}-${i}`} className="flex gap-3 items-start">
               <ChatAvatar
                 username={msg.publicUser?.username ?? "?"}
                 profilePicture={msg.publicUser?.profilePicture}
               />
               <div className="flex-1 min-w-0">
-                <div className="flex items-baseline gap-3">
-                  <span className="text-lg font-bold text-gray-200 truncate">
+                <div className="flex items-baseline gap-2">
+                  <span className={`text-sm font-semibold ${bodyText} truncate`}>
                     {msg.publicUser?.username ?? "Unknown"}
                   </span>
-                  <span className="text-base text-gray-400 flex-shrink-0">
+                  <span className={`text-[11px] ${subtleText} flex-shrink-0`}>
                     {formatChatTime(msg.createdAt)}
                   </span>
                 </div>
-                <p className="text-lg text-gray-300 break-words leading-snug mt-1">
+                <p className={`text-sm ${bodyText} break-words leading-5 mt-0.5`}>
                   {msg.text}
                 </p>
               </div>
@@ -159,14 +166,15 @@ export function ProfileLiveChat({
         <div ref={bottomRef} />
       </div>
       {/* Corsa site link button */}
-      <div className="flex justify-center p-4 border-t border-gray-700 bg-gray-900">
+      <div className={`flex flex-col items-center gap-2 p-4 border-t ${borderColor} ${isDark ? "bg-gray-900/80" : "bg-gray-100"}`}>
+        <p className={`text-xs ${subtleText}`}>Sign in on Corsa to join the chat.</p>
         <a
           href={`https://www.corsa.run/profile/${username}/stream/${streamId}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-block px-8 py-3 text-xl font-bold text-white bg-red-600 hover:bg-red-700 rounded shadow transition-colors"
+          className="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-md shadow transition-colors"
         >
-          Visit Corsa to chat
+          Open chat on Corsa
         </a>
       </div>
     </div>

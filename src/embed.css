@@ -440,6 +440,20 @@
   word-break: break-word;
 }
 
+.ce-chat-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #3f3f46 transparent;
+}
+
+.ce-chat-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.ce-chat-scroll::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 999px;
+}
+
 /* ---- Feed / Posts ---- */
 .ce-feed {
   padding: 0 0 14px;
