@@ -5,14 +5,18 @@ type ElapsedTimeProps = {
   startTime: string | Date;
   finishTime?: string | null;
   intervalMs?: number;
+  delayInSeconds?: number | null;
 };
 
 export function ElapsedTime({
   startTime,
   finishTime,
   intervalMs = 1000,
+  delayInSeconds = 0,
 }: ElapsedTimeProps) {
-  const start = parseDateTime(startTime);
+  // Apply delay by shifting the start time forward
+  const rawStart = parseDateTime(startTime);
+  const start = rawStart !== null && delayInSeconds ? rawStart + delayInSeconds * 1000 : rawStart;
 
   const getElapsedSecs = (): number | null => {
     if (start === null) return null;
@@ -34,7 +38,7 @@ export function ElapsedTime({
     }, intervalMs);
 
     return () => clearInterval(timer);
-  }, [start, finishTime, intervalMs]);
+  }, [start, finishTime, intervalMs, delayInSeconds]);
 
   if (elapsedSecs === null) return <span>—</span>;
   return <span>{toDDHHMMSS(elapsedSecs)}</span>;

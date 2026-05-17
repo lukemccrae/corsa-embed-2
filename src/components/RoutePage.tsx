@@ -5,7 +5,7 @@ import { ROUTE_QUERY } from "../helpers/queries";
 import { useUser } from "../context/useUser";
 import { domain } from "../context/domain.context";
 import { CoverMap } from "./CoverMap";
-import { ElevationProfile } from "./ElevationProfile";
+// import { ElevationProfile } from "./ElevationProfile";
 import { LoadingSkeleton } from "./LoadingSkeleton";
 import { useTheme } from "./ThemeProvider";
 
@@ -236,16 +236,7 @@ export function RoutePage({ username, routeId, components = {} }: RoutePageProps
             </div>
           )}
 
-          {/* Elevation Profile */}
-          {altitudeProfile.length >= 2 && showElevation && (
-            <div>
-              <ElevationProfile
-                waypoints={[]}
-                altitudeProfile={altitudeProfile}
-                distanceLabels={distanceLabels}
-              />
-            </div>
-          )}
+          {/* Elevation Profile disabled */}
         </div>
       )}
     </div>

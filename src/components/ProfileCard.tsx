@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { Button } from "primereact/button";
 import { ElapsedTime } from "./ElapsedTime";
 import { useTheme } from "./ThemeProvider";
@@ -9,6 +8,7 @@ type LiveProfileCardProps = {
   streamTitle?: string;
   startTime?: Date;
   finishTime?: string | null;
+  delayInSeconds?: number | null;
   timezone?: string | null;
   isLive?: boolean;
   routeId?: string | null;
@@ -25,7 +25,7 @@ export default function LiveProfileCard({
   streamTitle,
   startTime,
   finishTime,
-  timezone,
+  delayInSeconds,
   // isLive,
   routeId,
   routeName,
@@ -74,37 +74,37 @@ export default function LiveProfileCard({
   //   return isLive ? "live" : "finished";
   // }, [isLive, startTime]);
 
-  const formattedStart = useMemo(() => {
-    if (!startTime) return null;
-    try {
-      return startTime.toLocaleString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-        hour: "numeric",
-        minute: "2-digit",
-        timeZone: timezone ?? undefined,
-      });
-    } catch {
-      return startTime.toLocaleString();
-    }
-  }, [startTime, timezone]);
+  // const formattedStart = useMemo(() => {
+  //   if (!startTime) return null;
+  //   try {
+  //     return startTime.toLocaleString("en-US", {
+  //       month: "short",
+  //       day: "numeric",
+  //       year: "numeric",
+  //       hour: "numeric",
+  //       minute: "2-digit",
+  //       timeZone: timezone ?? undefined,
+  //     });
+  //   } catch {
+  //     return startTime.toLocaleString();
+  //   }
+  // }, [startTime, timezone]);
 
-  const formattedFinish = useMemo(() => {
-    if (!finishTime) return null;
-    try {
-      return new Date(finishTime).toLocaleString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-        hour: "numeric",
-        minute: "2-digit",
-        timeZone: timezone ?? undefined,
-      });
-    } catch {
-      return null;
-    }
-  }, [finishTime, timezone]);
+  // const formattedFinish = useMemo(() => {
+  //   if (!finishTime) return null;
+  //   try {
+  //     return new Date(finishTime).toLocaleString("en-US", {
+  //       month: "short",
+  //       day: "numeric",
+  //       year: "numeric",
+  //       hour: "numeric",
+  //       minute: "2-digit",
+  //       timeZone: timezone ?? undefined,
+  //     });
+  //   } catch {
+  //     return null;
+  //   }
+  // }, [finishTime, timezone]);
 
   return (
     <div
@@ -171,7 +171,12 @@ export default function LiveProfileCard({
               </p>
               {bio && (
                 <p className={`mt-2 text-lg text-gray-400 dark:text-gray-300 break-words max-w-full`}>
-                  {bio}
+                  {/* Linkify URLs in bio */}
+                  {bio && bio.split(/(https?:\/\/[^\s]+)/g).map((part, i) =>
+                    part.match(/^https?:\/\//)
+                      ? <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="underline text-blue-400 hover:text-blue-600">{part}</a>
+                      : part
+                  )}
                 </p>
               )}
               {routeId && (
@@ -200,11 +205,11 @@ export default function LiveProfileCard({
               <div className="flex items-center gap-1">
                 <i className="pi pi-clock text-xs" />
                 <span className="inline-block tabular-nums min-w-[8ch] text-right">
-                  <ElapsedTime startTime={startTime} finishTime={finishTime} />
+                  <ElapsedTime startTime={startTime} finishTime={finishTime} delayInSeconds={delayInSeconds} />
                 </span>
               </div>
 
-              {formattedStart && (
+              {/* {formattedStart && (
                 <div className="flex items-center gap-1">
                   <i className="pi pi-calendar text-xs" />
                   <span>{formattedStart}</span>
@@ -216,7 +221,7 @@ export default function LiveProfileCard({
                   <i className="pi pi-flag text-xs" />
                   <span>{formattedFinish}</span>
                 </div>
-              )}
+              )} */}
             </div>
           )}
         </div>

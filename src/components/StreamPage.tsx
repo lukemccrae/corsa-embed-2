@@ -20,7 +20,7 @@ import LiveProfileCard from "./ProfileCard";
 import { CoverMap } from "./CoverMap";
 import { ProfileLiveChat } from "./ProfileLiveChat";
 import { FeedItem } from "./FeedItem";
-import { ElevationProfile } from "./ElevationProfile";
+// import { ElevationProfile } from "./ElevationProfile";
 import { getProfilePictureUrl } from "../utils/userImages";
 import { useTheme } from "./ThemeProvider";
 
@@ -88,7 +88,7 @@ export function StreamPage({
   // Default all components to visible if not explicitly set
   const showMap = components.map !== false;
   const showPosts = components.posts !== false;
-  const showElevation = components.elevation !== false;
+  // const showElevation = components.elevation !== false;
   const showProfile = components.profile !== false;
   const showChat = components.chat !== false;
 
@@ -296,6 +296,7 @@ export function StreamPage({
           finishTime={finishTime}
           timezone={stream.timezone}
           isLive={isLive}
+          delayInSeconds={stream.delayInSeconds}
           routeId={stream.route?.routeId ?? null}
           routeName={stream.route?.name ?? null}
           bio={user.bio ?? null}
@@ -328,14 +329,7 @@ export function StreamPage({
               </div>
             )}
 
-            {/* Elevation Profile */}
-            {waypointsWithAlt.length >= 2 && showElevation && (
-              <div
-                className={`${cardBg} border rounded-lg shadow-lg overflow-hidden`}
-              >
-                <ElevationProfile waypoints={publicWaypoints} />
-              </div>
-            )}
+            {/* Elevation Profile disabled */}
           </div>
         )}
 
