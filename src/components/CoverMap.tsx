@@ -16,7 +16,7 @@ import { getPostImageUrl } from "../utils/userImages";
 
 
 
-// Leaflet scale control as a React component
+// Leaflet scale control in bottom-right corner
 function LeafletScaleControl() {
   const map = useMap();
   useEffect(() => {
@@ -25,6 +25,7 @@ function LeafletScaleControl() {
       metric: true,
       imperial: true,
       updateWhenIdle: false,
+      position: "bottomright",
     });
     scale.addTo(map);
     return () => {
@@ -33,6 +34,7 @@ function LeafletScaleControl() {
   }, [map]);
   return null;
 }
+
 
 // Fix Leaflet default icon resolution (no bundler plugin needed)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -100,6 +102,8 @@ export interface CoverMapProps {
    * from the class (useful for container-query-driven responsive heights).
    */
   wrapperClassName?: string;
+  /** Athlete profile picture URL – used for the live position marker */
+  profilePicture?: string | null;
 }
 
 export function CoverMap({
@@ -109,6 +113,7 @@ export function CoverMap({
   height = 360,
   posts = [],
   wrapperClassName,
+  profilePicture,
 }: CoverMapProps) {
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
 
@@ -188,6 +193,17 @@ export function CoverMap({
       popupAnchor: [0, -24  ],
     });
 
+  // Profile photo DivIcon for the live tracker position
+  const profileMarkerIcon = profilePicture
+    ? L.divIcon({
+        className: "",
+        html: `<div class="ce-profile-map-marker" style="background-image: url('${encodeURI(profilePicture)}');"></div>`,
+        iconSize: [44, 44],
+        iconAnchor: [22, 22],
+        popupAnchor: [0, -24],
+      })
+    : null;
+
 
   return (
     <>
@@ -217,10 +233,10 @@ export function CoverMap({
             <Polyline
               positions={routePositions}
               pathOptions={{
-                color: "#6366f1",
+                color: "#000",
                 weight: 3,
-                opacity: 0.6,
-                dashArray: "6 4",
+                opacity: 0.9,
+                dashArray: undefined,
               }}
             />
           )}
@@ -229,7 +245,7 @@ export function CoverMap({
           {waypointPositions.length > 1 && (
             <Polyline
               positions={waypointPositions}
-              pathOptions={{ color: "#ef4444", weight: 4, opacity: 0.9 }}
+              pathOptions={{ color: "#000", weight: 4, opacity: 0.9 }}
             />
           )}
 
@@ -248,26 +264,26 @@ export function CoverMap({
               <CircleMarker
                 key={`wp-dot-${idx}`}
                 center={[w.lat, w.lng]}
-                radius={4}
+                radius={5}
                 pathOptions={{
                   color: "#fff",
-                  fillColor: "#ef4444",
+                  fillColor: "#000",
                   fillOpacity: 1,
-                  weight: 1.5,
+                  weight: 2,
                 }}
               >
                 <Popup>
                   <div className="ce-wp-popup">
-                    {routeGeoJson && w.mileMarker != null && (
+                    {w.mileMarker != null && (
                       <div className="ce-wp-popup-row">
                         <span className="ce-wp-popup-label">Distance</span>
                         <span className="ce-wp-popup-value">{w.mileMarker.toFixed(2)} mi</span>
                       </div>
                     )}
-                    {w.altitude != null && (
+                    {w.cumulativeVert != null && (
                       <div className="ce-wp-popup-row">
-                        <span className="ce-wp-popup-label">Altitude</span>
-                        <span className="ce-wp-popup-value">{Math.round(w.altitude)} ft</span>
+                        <span className="ce-wp-popup-label">Gain</span>
+                        <span className="ce-wp-popup-value">{Math.round(w.cumulativeVert)} ft</span>
                       </div>
                     )}
                     {elapsed && (
@@ -282,18 +298,25 @@ export function CoverMap({
             );
           })}
 
-          {/* Live tracker dot at current position */}
+          {/* Live tracker: profile photo marker (or fallback circle) at current position */}
           {trackerPos && isLive && (
-            <CircleMarker
-              center={trackerPos}
-              radius={8}
-              pathOptions={{
-                color: "#fff",
-                fillColor: "#ef4444",
-                fillOpacity: 1,
-                weight: 2,
-              }}
-            />
+            profileMarkerIcon ? (
+              <Marker
+                position={trackerPos}
+                icon={profileMarkerIcon}
+              />
+            ) : (
+              <CircleMarker
+                center={trackerPos}
+                radius={8}
+                pathOptions={{
+                  color: "#fff",
+                  fillColor: "#ef4444",
+                  fillOpacity: 1,
+                  weight: 2,
+                }}
+              />
+            )
           )}
 
           {/* Start/end markers when not live */}

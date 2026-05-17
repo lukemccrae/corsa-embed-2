@@ -11,6 +11,8 @@ interface AppProps {
   streamId?: string;
   /** routeId for route embed mode */
   routeId?: string;
+  /** Device make for branding (e.g. "GARMIN" or "SPOT") */
+  deviceMake?: string;
   /** "stream" (default) | "route" */
   view?: "stream" | "route";
   /** Maximum height (px) for the feed/posts scroll area. Default: 600 */
@@ -28,7 +30,16 @@ interface AppProps {
   };
 }
 
-export default function App({ username, streamId, routeId, view, feedMaxHeight, chatMaxHeight, components }: AppProps) {
+export default function App({
+  username,
+  deviceMake,
+  streamId,
+  routeId,
+  view,
+  feedMaxHeight,
+  chatMaxHeight,
+  components,
+}: AppProps) {
   const resolvedView: "stream" | "route" =
     view === "route" || (!streamId && routeId) ? "route" : "stream";
 
@@ -38,9 +49,20 @@ export default function App({ username, streamId, routeId, view, feedMaxHeight, 
         <UserProvider>
           <div className="w-full">
             {resolvedView === "route" && routeId ? (
-              <RoutePage username={username} routeId={routeId} components={components} />
+              <RoutePage
+                username={username}
+                deviceMake={deviceMake}
+                routeId={routeId}
+                components={components}
+              />
             ) : streamId ? (
-              <StreamPage username={username} streamId={streamId} feedMaxHeight={feedMaxHeight} chatMaxHeight={chatMaxHeight} components={components} />
+              <StreamPage
+                username={username}
+                streamId={streamId}
+                feedMaxHeight={feedMaxHeight}
+                chatMaxHeight={chatMaxHeight}
+                components={components}
+              />
             ) : (
               <div className="p-6 text-red-300 bg-gray-900 rounded-lg text-center text-sm">
                 Missing stream or route configuration.
