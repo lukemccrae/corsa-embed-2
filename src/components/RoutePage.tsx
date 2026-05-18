@@ -87,6 +87,7 @@ export function RoutePage({ username, routeId, components = {} }: RoutePageProps
           data.getUserByUserName?.routes?.find(
             (r): r is Route => r?.routeId === routeId
           ) ?? null;
+          
         setRoute(matchedRoute);
       } catch (err) {
         setError(

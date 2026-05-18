@@ -23,6 +23,7 @@ import { FeedItem } from "./FeedItem";
 // import { ElevationProfile } from "./ElevationProfile";
 import { getProfilePictureUrl } from "../utils/userImages";
 import { useTheme } from "./ThemeProvider";
+import { domain } from "../context/domain.context";
 
 interface StreamPageProps {
   username: string;
@@ -79,6 +80,7 @@ export function StreamPage({
   const [user, setUser] = useState<User | null>(null);
   const [stream, setStream] = useState<LiveStream | null>(null);
   const [waypoints, setWaypoints] = useState<Waypoint[]>([]);
+  const [routeGeoJson, setRouteGeoJson] = useState<{ coordinates: [number, number, number?][] } | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatNextToken, setChatNextToken] = useState<string | null>(null);
   const [chatLoadingMore, setChatLoadingMore] = useState(false);
@@ -126,6 +128,24 @@ export function StreamPage({
           chatConn?.items?.filter((m): m is ChatMessage => m != null) ?? [],
         );
         setChatNextToken(chatConn?.nextToken ?? null);
+
+        // Fetch GeoJSON for the route if available
+        if (liveStream?.route?.storagePath) {
+          fetch(`${domain.geoJsonCdnBaseUrl}/${liveStream.route.storagePath}`)
+            .then((r) => r.json())
+            .then((json) => {
+              // Defensive: expect FeatureCollection, extract coordinates from first feature
+              const coords = json?.features?.[0]?.geometry?.coordinates ?? [];
+              if (coords.length > 0) {
+                setRouteGeoJson({ coordinates: coords });
+              } else {
+                setRouteGeoJson(null);
+              }
+            })
+            .catch(() => setRouteGeoJson(null))
+        } else {
+          setRouteGeoJson(null);
+        }
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Failed to load stream data",
@@ -326,6 +346,7 @@ export function StreamPage({
                   wrapperClassName="ce-map-responsive"
                   posts={posts}
                   profilePicture={getProfilePictureUrl({ profilePicture: user.profilePicture })}
+                  routeGeoJson={routeGeoJson}
                 />
               </div>
             )}

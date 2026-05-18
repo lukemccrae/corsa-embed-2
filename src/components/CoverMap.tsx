@@ -14,8 +14,6 @@ import "leaflet/dist/leaflet.css";
 import type { Post, StatusPost, Waypoint } from "../generated/schema";
 import { getPostImageUrl } from "../utils/userImages";
 
-
-
 // Leaflet scale control in bottom-right corner
 function LeafletScaleControl() {
   const map = useMap();
@@ -34,7 +32,6 @@ function LeafletScaleControl() {
   }, [map]);
   return null;
 }
-
 
 // Fix Leaflet default icon resolution (no bundler plugin needed)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -171,7 +168,7 @@ export function CoverMap({
       : postPositions;
 
   // Debug logging
-  console.log('[CoverMap] Debug:', {
+  console.log("[CoverMap] Debug:", {
     postsCount: posts.length,
     locatedPostsCount: locatedPosts.length,
     postPositionsCount: postPositions.length,
@@ -190,7 +187,7 @@ export function CoverMap({
         : `<div class="ce-post-marker"><i class="pi pi-comment"></i></div>`,
       iconSize: [48, 48],
       iconAnchor: [24, 24],
-      popupAnchor: [0, -24  ],
+      popupAnchor: [0, -24],
     });
 
   // Profile photo DivIcon for the live tracker position
@@ -204,12 +201,13 @@ export function CoverMap({
       })
     : null;
 
-
   return (
     <>
       <div
         ref={mapDivRef}
-        className={['w-full rounded-lg overflow-hidden', wrapperClassName].filter(Boolean).join(' ')}
+        className={["w-full rounded-lg overflow-hidden", wrapperClassName]
+          .filter(Boolean)
+          .join(" ")}
         style={wrapperClassName ? undefined : { height }}
       >
         <MapContainer
@@ -228,25 +226,18 @@ export function CoverMap({
           )}
           <MapInvalidator />
 
-          {/* Reference route polyline (e.g. pre-planned GeoJSON route) */}
+          {/* Reference route polyline (e.g. pre-planned GeoJSON route) - draw first, behind waypoints */}
           {routePositions.length > 1 && (
-            <Polyline
-              positions={routePositions}
-              pathOptions={{
-                color: "#000",
-                weight: 3,
-                opacity: 0.9,
-                dashArray: undefined,
-              }}
-            />
-          )}
-
-          {/* Live waypoint trail */}
-          {waypointPositions.length > 1 && (
-            <Polyline
-              positions={waypointPositions}
-              pathOptions={{ color: "#000", weight: 4, opacity: 0.9 }}
-            />
+                  <Polyline
+                    positions={routePositions}
+                    pathOptions={{
+                      color: "#000",
+                      weight: 3,
+                      opacity: 0.9,
+                      dashArray: undefined,
+                    }}
+                    pane="shadowPane"
+                  />
           )}
 
           {/* Waypoint dot markers (all waypoints, with popup details) */}
@@ -277,13 +268,17 @@ export function CoverMap({
                     {w.mileMarker != null && (
                       <div className="ce-wp-popup-row">
                         <span className="ce-wp-popup-label">Distance</span>
-                        <span className="ce-wp-popup-value">{w.mileMarker.toFixed(2)} mi</span>
+                        <span className="ce-wp-popup-value">
+                          {w.mileMarker.toFixed(2)} mi
+                        </span>
                       </div>
                     )}
                     {w.cumulativeVert != null && (
                       <div className="ce-wp-popup-row">
                         <span className="ce-wp-popup-label">Gain</span>
-                        <span className="ce-wp-popup-value">{Math.round(w.cumulativeVert)} ft</span>
+                        <span className="ce-wp-popup-value">
+                          {Math.round(w.cumulativeVert)} ft
+                        </span>
                       </div>
                     )}
                     {elapsed && (
@@ -299,12 +294,42 @@ export function CoverMap({
           })}
 
           {/* Live tracker: profile photo marker (or fallback circle) at current position */}
-          {trackerPos && isLive && (
-            profileMarkerIcon ? (
-              <Marker
-                position={trackerPos}
-                icon={profileMarkerIcon}
-              />
+          {trackerPos &&
+            isLive &&
+            (profileMarkerIcon ? (
+              <Marker position={trackerPos} icon={profileMarkerIcon}>
+                {/* Popup with stats: mile and time, styled like waypoint popups */}
+                {waypoints.length > 0 && (
+                  <Popup>
+                    <div className="ce-wp-popup">
+                      {waypoints[waypoints.length - 1].mileMarker != null && (
+                        <div className="ce-wp-popup-row">
+                          <span className="ce-wp-popup-label">Distance</span>
+                          <span className="ce-wp-popup-value">
+                          {/* @ts-ignore */}
+                            {waypoints[waypoints.length - 1].mileMarker.toFixed(
+                              2,
+                            )}{" "}
+                            mi
+                          </span>
+                        </div>
+                      )}
+                      {waypoints[waypoints.length - 1].cumulativeVert !=
+                        null && (
+                        <div className="ce-wp-popup-row">
+                          <span className="ce-wp-popup-label">Gain</span>
+                          <span className="ce-wp-popup-value">
+                            {/* @ts-ignore */}
+                            {Math.round(waypoints[waypoints.length - 1].cumulativeVert,
+                            )}{" "}
+                            ft
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </Popup>
+                )}
+              </Marker>
             ) : (
               <CircleMarker
                 center={trackerPos}
@@ -316,8 +341,7 @@ export function CoverMap({
                   weight: 2,
                 }}
               />
-            )
-          )}
+            ))}
 
           {/* Start/end markers when not live */}
           {waypointPositions.length > 0 && !isLive && (
@@ -371,13 +395,13 @@ export function CoverMap({
                 }
               }
               if (closest) {
-                  distance = closest.mileMarker ?? null;
-                  altitude = closest.altitude ?? null;
-                  // Elapsed time from first waypoint
-                  const start = new Date(waypoints[0].timestamp).getTime();
-                  let rawElapsed = toDDHHMMSS((postTime - start) / 1000);
-                  elapsed = rawElapsed.replace(/^0{0,2}0?0?d\s*/, "");
-                }
+                distance = closest.mileMarker ?? null;
+                altitude = closest.altitude ?? null;
+                // Elapsed time from first waypoint
+                const start = new Date(waypoints[0].timestamp).getTime();
+                let rawElapsed = toDDHHMMSS((postTime - start) / 1000);
+                elapsed = rawElapsed.replace(/^0{0,2}0?0?d\s*/, "");
+              }
             }
             return (
               <Marker
