@@ -13,6 +13,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { Post, StatusPost, Waypoint } from "../generated/schema";
 import { getPostImageUrl } from "../utils/userImages";
+import corsaLogo from "../assets/corsa-logo.svg";
 
 // Leaflet scale control in bottom-right corner
 function LeafletScaleControl() {
@@ -487,7 +488,7 @@ export function CoverMap({
           rel="noopener noreferrer"
           aria-label="Corsa"
         >
-          <img className="ce-map-branding-logo" src="/corsa-logo.svg" alt="" />
+          <img className="ce-map-branding-logo" src={corsaLogo} alt="" />
           <span className="ce-map-branding-text">Corsa</span>
         </a>
       </div>

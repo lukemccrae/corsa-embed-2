@@ -44,7 +44,7 @@ export default function App({
     <PrimeReactProvider>
       <ThemeProvider>
         <UserProvider>
-          <div className="w-full max-w-xl mx-auto">
+          <div className="w-full max-w-3xl mx-auto">
             {resolvedView === "route" && routeId ? (
               <RoutePage
                 username={username}

@@ -143,10 +143,15 @@ export default function LiveProfileCard({
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <h2
-                  className={`text-4xl font-extrabold ${textColor} truncate`}
-                >
-                  {username}
+                <h2 className={`text-4xl font-extrabold ${textColor} truncate`}>
+                  <a
+                    href={`https://www.corsa.run/profile/${encodeURIComponent(username)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline"
+                  >
+                    {username}
+                  </a>
                 </h2>
                 {/* {effectiveStatus !== undefined && (
                   <span
