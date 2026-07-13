@@ -101,6 +101,8 @@ export interface CoverMapProps {
   wrapperClassName?: string;
   /** Athlete profile picture URL – used for the live position marker */
   profilePicture?: string | null;
+  /** Unit of measure for distance display ("METRIC" or "IMPERIAL") */
+  unitOfMeasure?: "METRIC" | "IMPERIAL";
 }
 
 export function CoverMap({
@@ -111,9 +113,10 @@ export function CoverMap({
   posts = [],
   wrapperClassName,
   profilePicture,
+  unitOfMeasure,
 }: CoverMapProps) {
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
-
+  console.log(unitOfMeasure, "unitOfMeasure prop in CoverMap");
   // Ref to map container div (no longer used for scale)
   const mapDivRef = useRef<HTMLDivElement>(null);
 
@@ -269,7 +272,9 @@ export function CoverMap({
                       <div className="ce-wp-popup-row">
                         <span className="ce-wp-popup-label">Distance</span>
                         <span className="ce-wp-popup-value">
-                          {w.mileMarker.toFixed(2)} mi
+                          {unitOfMeasure === "METRIC"
+                            ? (w.mileMarker * 1.60934).toFixed(2) + " km"
+                            : w.mileMarker.toFixed(2) + " mi"}
                         </span>
                       </div>
                     )}
@@ -305,13 +310,17 @@ export function CoverMap({
                       {waypoints[waypoints.length - 1].mileMarker != null && (
                         <div className="ce-wp-popup-row">
                           <span className="ce-wp-popup-label">Distance</span>
-                          <span className="ce-wp-popup-value">
-                          {/* @ts-ignore */}
-                            {waypoints[waypoints.length - 1].mileMarker.toFixed(
-                              2,
-                            )}{" "}
-                            mi
-                          </span>
+                          {unitOfMeasure === "METRIC" ? (
+                            <span className="ce-wp-popup-value">
+                              {(waypoints[waypoints.length - 1].mileMarker! * 1.60934).toFixed(2)}{" "}
+                              km
+                            </span>
+                          ) : (
+                            <span className="ce-wp-popup-value">
+                              {waypoints[waypoints.length - 1].mileMarker!.toFixed(2)}{" "}
+                              mi
+                            </span>
+                          )}
                         </div>
                       )}
                       {waypoints[waypoints.length - 1].cumulativeVert !=
@@ -444,7 +453,9 @@ export function CoverMap({
                     <div style={{ marginTop: 8, fontSize: 13, color: "#eee" }}>
                       {routeGeoJson && distance !== null && (
                         <div>
-                          <strong>Distance:</strong> {distance.toFixed(2)} mi
+                          <strong>Distance:</strong> {unitOfMeasure === "METRIC"
+                            ? (distance * 1.60934).toFixed(2) + " km"
+                            : distance.toFixed(2) + " mi"}
                         </div>
                       )}
                       {altitude !== null && (

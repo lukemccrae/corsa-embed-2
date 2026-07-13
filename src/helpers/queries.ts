@@ -29,6 +29,7 @@ export const STREAM_PROFILE_QUERY = (
         timezone
         startTime
         finishTime
+        unitOfMeasure
         live
         delayInSeconds
         currentLocation {

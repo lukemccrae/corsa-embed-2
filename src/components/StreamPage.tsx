@@ -111,8 +111,9 @@ export function StreamPage({
           {},
           token,
         );
-
+        
         const userData = data.getUserByUserName;
+        console.log(userData, "fetched stream profile data");
         setUser(userData);
 
         const liveStream = userData.liveStreams?.[0] ?? null;
@@ -347,6 +348,7 @@ export function StreamPage({
                   posts={posts}
                   profilePicture={getProfilePictureUrl({ profilePicture: user.profilePicture })}
                   routeGeoJson={routeGeoJson}
+                  unitOfMeasure={stream.unitOfMeasure ?? undefined}
                 />
               </div>
             )}
