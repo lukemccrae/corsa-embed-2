@@ -620,6 +620,12 @@
   user-select: none;
 }
 
+.ce-map-branding--inline {
+  position: static;
+  left: auto;
+  bottom: auto;
+}
+
 .ce-map-branding:hover {
   transform: translateY(-1px);
   background: linear-gradient(180deg, rgba(26, 36, 52, 0.96) 0%, rgba(12, 18, 30, 0.92) 100%);

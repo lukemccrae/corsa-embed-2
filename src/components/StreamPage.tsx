@@ -24,6 +24,7 @@ import { FeedItem } from "./FeedItem";
 import { getProfilePictureUrl } from "../utils/userImages";
 import { useTheme } from "./ThemeProvider";
 import { domain } from "../context/domain.context";
+import corsaLogo from "../assets/corsa-logo.svg";
 
 interface StreamPageProps {
   username: string;
@@ -328,6 +329,22 @@ export function StreamPage({
       {allWaypointsHidden && (
         <div className="p-4 mb-4 bg-yellow-100 text-yellow-800 rounded text-center text-sm border border-yellow-300">
           Location points are currently hidden due to privacy settings.
+        </div>
+      )}
+
+      {/* When there is no map to render (private/no waypoints), keep Corsa branding visible */}
+      {!hasMap && (
+        <div className="mb-3">
+          <a
+            className="ce-map-branding ce-map-branding--inline"
+            href="https://corsa.run"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Corsa"
+          >
+            <img className="ce-map-branding-logo" src={corsaLogo} alt="" />
+            <span className="ce-map-branding-text">Corsa</span>
+          </a>
         </div>
       )}
 
