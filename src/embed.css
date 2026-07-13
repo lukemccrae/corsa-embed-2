@@ -598,18 +598,49 @@
 
 /* ---- CORSA map branding (bottom-left overlay) ---- */
 .ce-map-branding {
-  background: rgba(0, 0, 0, 0.65);
-  border-radius: 4px;
-  padding: 4px 8px;
-  pointer-events: none;
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  z-index: 400;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: linear-gradient(180deg, rgba(22, 30, 44, 0.9) 0%, rgba(10, 16, 28, 0.84) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  text-decoration: none;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 6px 16px rgba(0, 0, 0, 0.26);
+  transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   user-select: none;
+}
+
+.ce-map-branding:hover {
+  transform: translateY(-1px);
+  background: linear-gradient(180deg, rgba(26, 36, 52, 0.96) 0%, rgba(12, 18, 30, 0.92) 100%);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.32),
+    0 8px 18px rgba(0, 0, 0, 0.28);
+}
+
+.ce-map-branding-logo {
+  width: 24px;
+  height: 24px;
+  display: block;
+  flex: 0 0 auto;
 }
 
 .ce-map-branding-text {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: 11px;
-  font-weight: 800;
-  color: #ef4444;
-  letter-spacing: 2px;
-  text-transform: uppercase;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.02em;
 }

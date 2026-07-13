@@ -208,14 +208,14 @@ export function CoverMap({
     <>
       <div
         ref={mapDivRef}
-        className={["w-full rounded-lg overflow-hidden", wrapperClassName]
+        className={["w-full rounded-lg overflow-hidden relative", wrapperClassName]
           .filter(Boolean)
           .join(" ")}
         style={wrapperClassName ? undefined : { height }}
       >
         <MapContainer
           center={defaultCenter}
-          zoom={11}
+          zoom={8}
           scrollWheelZoom={true}
           attributionControl={false}
           style={{ width: "100%", height: "100%" }}
@@ -478,6 +478,18 @@ export function CoverMap({
           {/* Distance scale overlay using Leaflet's built-in control */}
           <LeafletScaleControl />
         </MapContainer>
+
+        {/* Corsa branding in bottom left */}
+        <a
+          className="ce-map-branding"
+          href="https://corsa.run"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Corsa"
+        >
+          <img className="ce-map-branding-logo" src="/corsa-logo.svg" alt="" />
+          <span className="ce-map-branding-text">Corsa</span>
+        </a>
       </div>
 
       {/* Lightbox overlay */}
