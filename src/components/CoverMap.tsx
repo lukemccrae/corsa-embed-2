@@ -79,6 +79,17 @@ function MapInvalidator() {
   return null;
 }
 
+/** Creates a dedicated pane for the route so it renders under markers. */
+function RoutePaneSetup() {
+  const map = useMap();
+  useEffect(() => {
+    const pane = map.getPane("routePane") ?? map.createPane("routePane");
+    pane.style.zIndex = "350";
+    pane.style.pointerEvents = "none";
+  }, [map]);
+  return null;
+}
+
 interface GeoJsonLine {
   /** Array of [lng, lat, alt?] coordinate tuples from a GeoJSON file */
   coordinates: [number, number, number?][];
@@ -229,18 +240,19 @@ export function CoverMap({
             <BoundsUpdater positions={allPositions} />
           )}
           <MapInvalidator />
+          <RoutePaneSetup />
 
           {/* Reference route polyline (e.g. pre-planned GeoJSON route) - draw first, behind waypoints */}
           {routePositions.length > 1 && (
                   <Polyline
                     positions={routePositions}
                     pathOptions={{
-                      color: "#000",
+                      color: "red",
                       weight: 3,
                       opacity: 0.9,
                       dashArray: undefined,
                     }}
-                    pane="shadowPane"
+                    pane="routePane"
                   />
           )}
 
