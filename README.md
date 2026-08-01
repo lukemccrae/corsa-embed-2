@@ -73,6 +73,22 @@ container 100 % horizontally and grow vertically to fit its content.
 </div>
 ```
 
+While the bundle is being downloaded from your CDN/S3, a "Loading..." placeholder
+is shown. If you mount into an existing element with `data-mount`, put the
+placeholder inside that element so it displays until React replaces it:
+
+```html
+<div id="my-embed" style="width: 100%; max-width: 1200px;">
+  Loading...
+</div>
+<script
+  src="https://your-cdn/bundle.js"
+  data-username="alice"
+  data-stream-id="stream-123"
+  data-mount="#my-embed"
+></script>
+```
+
 The bundle inserts a `<div class="corsa-embed-container">` immediately after the
 `<script>` tag and mounts the React app into it. That container is `width: 100%`
 by default, so it fills whatever wrapper you provide.

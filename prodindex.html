@@ -9,7 +9,23 @@
   <body>
     <!-- The embed bundle will auto-mount into this div (or one it creates).
          Keeping a dedicated container makes it predictable. -->
-    <div id="corsa-embed"></div>
+    <div id="corsa-embed">
+      <!-- Placeholder shown while the S3 bundle is downloading; replaced on mount -->
+      <div
+        style="
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          color: #8a8a8a;
+          font-size: 14px;
+          padding: 20px;
+          text-align: center;
+          background: #0f0f0f;
+          border-radius: 14px;
+          border: 1px solid #2a2a2a;
+        "
+      >
+        Loading...
+      </div>
+    </div>
 
     <!-- Load the single-file embed bundle -->
     <script

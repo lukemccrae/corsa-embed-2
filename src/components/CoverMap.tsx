@@ -12,7 +12,7 @@ import {
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { Post, StatusPost, Waypoint } from "../generated/schema";
-import { getPostImageUrl } from "../utils/userImages";
+import { getPostImageUrl, getProfilePictureUrl } from "../utils/userImages";
 import corsaLogo from "../assets/corsa-logo.svg";
 
 // Leaflet scale control in bottom-right corner
@@ -182,6 +182,21 @@ export function CoverMap({
       ? routePositions
       : postPositions;
 
+  const normalizeProfilePictureUrl = (picture: string) => {
+    const trimmed = picture.trim();
+    if (/^(https?:)?\/\//i.test(trimmed) || /^data:|^blob:/i.test(trimmed)) {
+      return trimmed;
+    }
+    return getProfilePictureUrl({ profilePicture: trimmed });
+  };
+
+  const escapeHtmlAttr = (value: string) =>
+    value
+      .replaceAll("&", "&amp;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;");
+
   // Debug logging
   console.log("[CoverMap] Debug:", {
     postsCount: posts.length,
@@ -206,10 +221,13 @@ export function CoverMap({
     });
 
   // Profile photo DivIcon for the live tracker position
-  const profileMarkerIcon = profilePicture
+  const profileMarkerUrl = profilePicture
+    ? normalizeProfilePictureUrl(profilePicture)
+    : null;
+  const profileMarkerIcon = profileMarkerUrl
     ? L.divIcon({
         className: "",
-        html: `<div class="ce-profile-map-marker" style="background-image: url('${encodeURI(profilePicture)}');"></div>`,
+        html: `<div class="ce-profile-map-marker"><img class="ce-profile-map-marker__img" src="${escapeHtmlAttr(profileMarkerUrl)}" alt="Profile" /></div>`,
         iconSize: [44, 44],
         iconAnchor: [22, 22],
         popupAnchor: [0, -24],
