@@ -1,6 +1,13 @@
 import React from "react"; // needed for JSX in IIFE/non-module context
 import { createRoot } from "react-dom/client";
 import App from "./App";
+import {
+  DEBUG_BUILD,
+  logHostEnvironment,
+  logResourceLoadIssues,
+  logCopyableDiagnostics,
+  startResourceErrorMonitor,
+} from "./utils/diagnostics";
 
 /**
  * Auto-mount logic:
@@ -39,6 +46,13 @@ function mount() {
   if (!scriptEl) {
     console.error("[CorsaEmbed] Could not locate the embedding <script> tag.");
     return;
+  }
+
+  // Diagnostics: report the hosted environment + watch for blocked assets.
+  // Compiled out of production builds (DEBUG_BUILD is a literal false).
+  if (DEBUG_BUILD) {
+    logHostEnvironment(scriptEl);
+    startResourceErrorMonitor();
   }
 
   const username = scriptEl.dataset.username;
@@ -119,6 +133,13 @@ function mount() {
       />
     </React.StrictMode>
   );
+
+  // Report any resources that were blocked or failed to finish loading.
+  if (DEBUG_BUILD) {
+    window.setTimeout(() => logResourceLoadIssues(), 3000);
+    // Single copyable JSON blob with env + blocked resources + marker state.
+    window.setTimeout(() => logCopyableDiagnostics(scriptEl), 3500);
+  }
 }
 
 // Expose a global API for manual / re-mounting scenarios
@@ -167,9 +188,15 @@ function mountTo(options: MountOptions) {
 }
 
 // Attach to window for external access
-(window as Window & { CorsaEmbed?: { mount: typeof mountTo } }).CorsaEmbed = {
+const corsaApi: { mount: typeof mountTo; copyDiagnostics?: () => void } = {
   mount: mountTo,
 };
+if (DEBUG_BUILD) {
+  // Re-run / re-copy the diagnostics JSON from the host page's console:
+  //   CorsaEmbed.copyDiagnostics()
+  corsaApi.copyDiagnostics = () => logCopyableDiagnostics();
+}
+(window as Window & { CorsaEmbed?: typeof corsaApi }).CorsaEmbed = corsaApi;
 
 // Auto-mount when the script runs
 mount();

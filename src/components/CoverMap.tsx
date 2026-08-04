@@ -13,6 +13,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { Post, StatusPost, Waypoint } from "../generated/schema";
 import { getPostImageUrl, getProfilePictureUrl } from "../utils/userImages";
+import { DEBUG_BUILD, inspectProfileMapMarker, ceDebug } from "../utils/diagnostics";
 import corsaLogo from "../assets/corsa-logo.svg";
 
 // Leaflet scale control in bottom-right corner
@@ -128,7 +129,17 @@ export function CoverMap({
   unitOfMeasure,
 }: CoverMapProps) {
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
-  console.log(unitOfMeasure, "unitOfMeasure prop in CoverMap");
+  if (DEBUG_BUILD) {
+    ceDebug(unitOfMeasure, "unitOfMeasure prop in CoverMap");
+  }
+
+  // Diagnostics: report whether the map profile photo actually loaded
+  // (naturalWidth) or was hidden/blocked (CSS size, visibility).
+  useEffect(() => {
+    if (!DEBUG_BUILD) return;
+    if (!profilePicture) return;
+    inspectProfileMapMarker();
+  }, [profilePicture]);
   // Ref to map container div (no longer used for scale)
   const mapDivRef = useRef<HTMLDivElement>(null);
 
@@ -197,8 +208,9 @@ export function CoverMap({
       .replaceAll("<", "&lt;")
       .replaceAll(">", "&gt;");
 
-  // Debug logging
-  console.log("[CoverMap] Debug:", {
+  // Debug logging (compiled out in production builds)
+  if (DEBUG_BUILD) {
+    ceDebug("[CoverMap] Debug:", {
     postsCount: posts.length,
     locatedPostsCount: locatedPosts.length,
     postPositionsCount: postPositions.length,
@@ -206,7 +218,8 @@ export function CoverMap({
     routePositionsCount: routePositions.length,
     allPositionsCount: allPositions.length,
     allPositions: allPositions.slice(0, 2), // First 2 positions for inspection
-  });
+    });
+  }
 
   // Build custom DivIcons for post markers (text-only = blue, image = photo thumbnail)
   const makePostIcon = (imageUrl: string | null) =>

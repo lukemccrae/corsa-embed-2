@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "update": "yarn build && node upload.js && sh invalidate-cash.sh",
+    "update:debug": "VITE_EMBED_DEBUG=true yarn build && node upload.js && sh invalidate-cash.sh",
     "codegen": "npx graphql-codegen"
   },
   "dependencies": {

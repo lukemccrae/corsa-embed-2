@@ -22,6 +22,7 @@ import { ProfileLiveChat } from "./ProfileLiveChat";
 import { FeedItem } from "./FeedItem";
 // import { ElevationProfile } from "./ElevationProfile";
 import { getProfilePictureUrl } from "../utils/userImages";
+import { DEBUG_BUILD, ceDebug } from "../utils/diagnostics";
 import { useTheme } from "./ThemeProvider";
 import { domain } from "../context/domain.context";
 import corsaLogo from "../assets/corsa-logo.svg";
@@ -114,7 +115,7 @@ export function StreamPage({
         );
         
         const userData = data.getUserByUserName;
-        console.log(userData, "fetched stream profile data");
+        // console.log(userData, "fetched stream profile data");
         setUser(userData);
 
         const liveStream = userData.liveStreams?.[0] ?? null;
@@ -288,15 +289,16 @@ export function StreamPage({
   );
   const hasMap = publicWaypoints.length > 0 || hasPostsWithLocation;
 
-  // Debug logging
-  console.log('[StreamPage] Debug:', {
+  // Debug logging (compiled out in production builds)
+  if (DEBUG_BUILD) {
+    ceDebug('[StreamPage] Debug:', {
     postsCount: posts.length,
     postsWithLocation: posts.filter((p) => p.location?.lat != null && p.location?.lng != null).length,
     hasPostsWithLocation,
     publicWaypointsCount: publicWaypoints.length,
     hasMap,
-  });
-
+    });
+  }
 
   // Only show elevation section when waypoints have altitude readings
   const waypointsWithAlt = publicWaypoints.filter((w) => w.altitude != null);

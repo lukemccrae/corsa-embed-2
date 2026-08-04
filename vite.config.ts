@@ -6,6 +6,12 @@ export default defineConfig({
   define: {
     global: 'globalThis',
     'process.env': {},
+    // Always provide a literal so esbuild can tree-shake the debug code out
+    // of production bundles (built via `yarn update`). Debug builds set
+    // VITE_EMBED_DEBUG=true (see `yarn update:debug`).
+    'import.meta.env.VITE_EMBED_DEBUG': JSON.stringify(
+      process.env.VITE_EMBED_DEBUG === "true" ? "true" : "false",
+    ),
   },
   build: {
     target: "es2015",          // ensure compatibility

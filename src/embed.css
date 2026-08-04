@@ -602,6 +602,25 @@
   object-fit: cover;
 }
 
+/*
+ * Host pages often ship global rules like `.leaflet-marker-icon img { ... }`
+ * that override the embed's single-class selectors and blow the 44px marker
+ * up to the photo's natural size. Anchor to the Leaflet marker element and
+ * pin the box with !important so host CSS can't resize the marker.
+ */
+.leaflet-marker-icon .ce-profile-map-marker {
+  width: 44px !important;
+  height: 44px !important;
+}
+
+.leaflet-marker-icon .ce-profile-map-marker__img {
+  display: block;
+  width: 44px !important;
+  height: 44px !important;
+  object-fit: cover;
+  object-position: center;
+}
+
 /* ---- CORSA map branding (bottom-left overlay) ---- */
 .ce-map-branding {
   position: absolute;
