@@ -6,7 +6,10 @@ dotenv.config();
 
 // Configuration
 const bucketName = "corsa-general-bucket";
-const fileKey = "corsa-bundle.js"; // S3 object key
+// S3 object key. Defaults to corsa-bundle.js; pass a key as the first CLI arg
+// to deploy the same build under a different name, e.g.
+//   node upload.js corsa-bundle-2.js
+const fileKey = process.argv[2] ?? "corsa-bundle.js";
 const localFilePath = "./dist-singlefile/bundle.js"; // Local file to upload
 
 // Initialize S3 client

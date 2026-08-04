@@ -7,8 +7,8 @@ export default defineConfig({
     global: 'globalThis',
     'process.env': {},
     // Always provide a literal so esbuild can tree-shake the debug code out
-    // of production bundles (built via `yarn update`). Debug builds set
-    // VITE_EMBED_DEBUG=true (see `yarn update:debug`).
+    // of production bundles (built via `yarn deploy:stable`). Debug builds set
+    // VITE_EMBED_DEBUG=true (see `yarn deploy:stable:debug`).
     'import.meta.env.VITE_EMBED_DEBUG': JSON.stringify(
       process.env.VITE_EMBED_DEBUG === "true" ? "true" : "false",
     ),

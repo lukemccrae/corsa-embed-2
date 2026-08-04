@@ -4,8 +4,9 @@ import { domain } from "../context/domain.context";
  * Debug logging for the Corsa embed.
  *
  * All verbose diagnostics are compiled in ONLY when the bundle is built with
- * VITE_EMBED_DEBUG=true (see package.json `update:debug`). Production builds
- * (`yarn update`) compile every log statement out, so hosts never see them.
+ * VITE_EMBED_DEBUG=true (see package.json `deploy:stable:debug`). Production
+ * builds (`yarn deploy:stable`) compile every log statement out, so hosts never
+ * see them.
  */
 
 const DEBUG_BUILD = import.meta.env.VITE_EMBED_DEBUG === "true";

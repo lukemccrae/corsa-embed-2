@@ -1,5 +1,5 @@
 schema:
-  - https://tuy3ixkamjcjpc5fzo2oqnnyym.appsync-api.us-west-1.amazonaws.com/graphql:
+  - ${VITE_APPSYNC_ENDPOINT}:
       headers:
         x-api-key: ${APPSYNC_API_KEY}
 

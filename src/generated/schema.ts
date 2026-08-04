@@ -21,6 +21,10 @@ export type Badge = {
   version: Scalars['String']['output'];
 };
 
+export enum BillingInterval {
+  Monthly = 'MONTHLY'
+}
+
 export type BlogPost = Post & {
   __typename?: 'BlogPost';
   createdAt: Scalars['AWSDateTime']['output'];
@@ -41,17 +45,28 @@ export type BlogPost = Post & {
  */
 export type Business = {
   __typename?: 'Business';
+  billingEmail?: Maybe<Scalars['String']['output']>;
   businessId: Scalars['ID']['output'];
   createdAt?: Maybe<Scalars['AWSDateTime']['output']>;
+  currentPeriodEnd?: Maybe<Scalars['AWSDateTime']['output']>;
+  embedLimit?: Maybe<Scalars['Int']['output']>;
   embeds: Array<Embed>;
+  monthlyWaypointLimit?: Maybe<Scalars['Int']['output']>;
   name: Scalars['String']['output'];
   ownerUserId: Scalars['ID']['output'];
+  refreshIntervalMinutes?: Maybe<Scalars['Int']['output']>;
+  stripeCustomerId?: Maybe<Scalars['String']['output']>;
+  stripeSubscriptionId?: Maybe<Scalars['String']['output']>;
+  subscriptionPlan?: Maybe<SubscriptionPlan>;
+  subscriptionStatus?: Maybe<SubscriptionStatus>;
+  unlimitedMonthlyWaypoints?: Maybe<Scalars['Boolean']['output']>;
   updatedAt?: Maybe<Scalars['AWSDateTime']['output']>;
 };
 
 export type BusinessInput = {
   businessId?: InputMaybe<Scalars['ID']['input']>;
   name: Scalars['String']['input'];
+  userId: Scalars['ID']['input'];
 };
 
 /**
@@ -86,6 +101,33 @@ export type ChatMessageInput = {
   text: Scalars['String']['input'];
   userId: Scalars['ID']['input'];
   username: Scalars['String']['input'];
+};
+
+export enum CheckoutSessionStatus {
+  Created = 'CREATED',
+  Error = 'ERROR',
+  NotPurchasable = 'NOT_PURCHASABLE'
+}
+
+export type CreateCheckoutSessionInput = {
+  billingEmail?: InputMaybe<Scalars['String']['input']>;
+  businessId?: InputMaybe<Scalars['ID']['input']>;
+  cancelUrl: Scalars['String']['input'];
+  ownerUserId: Scalars['ID']['input'];
+  planCode: SubscriptionPlan;
+  successUrl: Scalars['String']['input'];
+  targetEntityId: Scalars['ID']['input'];
+  targetEntityType: SubscriptionTargetEntityType;
+};
+
+export type CreateCheckoutSessionResponse = {
+  __typename?: 'CreateCheckoutSessionResponse';
+  checkoutSessionId?: Maybe<Scalars['ID']['output']>;
+  checkoutUrl?: Maybe<Scalars['String']['output']>;
+  message: Scalars['String']['output'];
+  requiresContact: Scalars['Boolean']['output'];
+  status: CheckoutSessionStatus;
+  success: Scalars['Boolean']['output'];
 };
 
 export type CreatePostImageUploadUrlInput = {
@@ -213,7 +255,8 @@ export type DeviceInput = {
 
 export enum DeviceLogo {
   Bivy = 'BIVY',
-  Garmin = 'GARMIN'
+  Garmin = 'GARMIN',
+  Spot = 'SPOT'
 }
 
 export enum DeviceStatus {
@@ -253,21 +296,35 @@ export type EmbedInput = {
   livestreamId: Scalars['ID']['input'];
   name?: InputMaybe<Scalars['String']['input']>;
   settings?: InputMaybe<EmbedSettingsInput>;
+  userId: Scalars['ID']['input'];
 };
 
 export type EmbedSettings = {
   __typename?: 'EmbedSettings';
+  feedMaxHeight?: Maybe<Scalars['Int']['output']>;
   showChat?: Maybe<Scalars['Boolean']['output']>;
+  showElevation?: Maybe<Scalars['Boolean']['output']>;
   showHeader?: Maybe<Scalars['Boolean']['output']>;
+  showMap?: Maybe<Scalars['Boolean']['output']>;
+  showPosts?: Maybe<Scalars['Boolean']['output']>;
+  showProfile?: Maybe<Scalars['Boolean']['output']>;
+  showRoute?: Maybe<Scalars['Boolean']['output']>;
   showSponsors?: Maybe<Scalars['Boolean']['output']>;
   theme?: Maybe<Scalars['String']['output']>;
 };
 
 export type EmbedSettingsInput = {
+  feedMaxHeight?: InputMaybe<Scalars['Int']['input']>;
   showChat?: InputMaybe<Scalars['Boolean']['input']>;
+  showElevation?: InputMaybe<Scalars['Boolean']['input']>;
   showHeader?: InputMaybe<Scalars['Boolean']['input']>;
+  showMap?: InputMaybe<Scalars['Boolean']['input']>;
+  showPosts?: InputMaybe<Scalars['Boolean']['input']>;
+  showProfile?: InputMaybe<Scalars['Boolean']['input']>;
+  showRoute?: InputMaybe<Scalars['Boolean']['input']>;
   showSponsors?: InputMaybe<Scalars['Boolean']['input']>;
   theme?: InputMaybe<Scalars['String']['input']>;
+  userId: Scalars['ID']['input'];
 };
 
 export type FullDataWaypoint = {
@@ -277,6 +334,20 @@ export type FullDataWaypoint = {
   elevation?: Maybe<Scalars['Float']['output']>;
   lat?: Maybe<Scalars['Float']['output']>;
   lng?: Maybe<Scalars['Float']['output']>;
+};
+
+export type GenerateHourlyTimeSeriesInput = {
+  createdAt: Scalars['AWSDateTime']['input'];
+  routeId: Scalars['ID']['input'];
+};
+
+export type GenerateHourlyTimeSeriesResponse = {
+  __typename?: 'GenerateHourlyTimeSeriesResponse';
+  bucket?: Maybe<Scalars['String']['output']>;
+  hourCount?: Maybe<Scalars['Int']['output']>;
+  key?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  success: Scalars['Boolean']['output'];
 };
 
 /**
@@ -306,9 +377,12 @@ export type LiveStream = {
   device?: Maybe<Device>;
   entity?: Maybe<Scalars['String']['output']>;
   finishTime?: Maybe<Scalars['String']['output']>;
+  ghostProfilePhoto?: Maybe<Scalars['String']['output']>;
+  ghostTrackUrl?: Maybe<Scalars['String']['output']>;
   live?: Maybe<Scalars['Boolean']['output']>;
   mileMarker?: Maybe<Scalars['Float']['output']>;
   posts?: Maybe<Array<Maybe<Post>>>;
+  private?: Maybe<Scalars['Boolean']['output']>;
   publicUser?: Maybe<PublicUser>;
   published?: Maybe<Scalars['Boolean']['output']>;
   route?: Maybe<Route>;
@@ -341,6 +415,7 @@ export type LiveStreamInput = {
   live?: InputMaybe<Scalars['Boolean']['input']>;
   mileMarker?: InputMaybe<Scalars['Float']['input']>;
   pointIndex?: InputMaybe<Scalars['Int']['input']>;
+  private?: InputMaybe<Scalars['Boolean']['input']>;
   published?: InputMaybe<Scalars['Boolean']['input']>;
   routeId?: InputMaybe<Scalars['ID']['input']>;
   slug?: InputMaybe<Scalars['String']['input']>;
@@ -387,6 +462,7 @@ export enum MessageType {
 export type Mutation = {
   __typename?: 'Mutation';
   confirmDeviceVerification: Device;
+  createCheckoutSession: CreateCheckoutSessionResponse;
   createPostImageUploadUrl: PostImageUploadUrlResponse;
   createPostMediaUploadUrl: PostMediaUploadUrlResponse;
   createUserImageUploadUrl: PresignedUrlResponse;
@@ -407,6 +483,7 @@ export type Mutation = {
   upsertEmbed: Embed;
   upsertLiveStream: LiveStreamSuccessResponse;
   upsertPost: Post;
+  upsertProductOffering: ProductOffering;
   upsertRoute: Route;
   upsertUser: User;
   validateDeviceShareUrl: ValidateShareUrlResult;
@@ -416,6 +493,11 @@ export type Mutation = {
 export type MutationConfirmDeviceVerificationArgs = {
   imei: Scalars['ID']['input'];
   verificationSessionId: Scalars['ID']['input'];
+};
+
+
+export type MutationCreateCheckoutSessionArgs = {
+  input: CreateCheckoutSessionInput;
 };
 
 
@@ -447,6 +529,7 @@ export type MutationDeleteDeviceArgs = {
 export type MutationDeleteEmbedArgs = {
   businessId: Scalars['ID']['input'];
   embedId: Scalars['ID']['input'];
+  userId?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
@@ -517,6 +600,11 @@ export type MutationUpsertLiveStreamArgs = {
 
 export type MutationUpsertPostArgs = {
   input: PostInput;
+};
+
+
+export type MutationUpsertProductOfferingArgs = {
+  input: ProductOfferingInput;
 };
 
 
@@ -618,6 +706,49 @@ export type PresignedUrlResponse = {
   uploadUrl: Scalars['String']['output'];
 };
 
+export type ProductOffering = {
+  __typename?: 'ProductOffering';
+  active: Scalars['Boolean']['output'];
+  billingInterval?: Maybe<BillingInterval>;
+  createdAt?: Maybe<Scalars['AWSDateTime']['output']>;
+  currency?: Maybe<Scalars['String']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  embedLimit?: Maybe<Scalars['Int']['output']>;
+  entityType: SubscriptionTargetEntityType;
+  metadataJson?: Maybe<Scalars['String']['output']>;
+  monthlyWaypointLimit?: Maybe<Scalars['Int']['output']>;
+  name: Scalars['String']['output'];
+  planCode: SubscriptionPlan;
+  priceCents?: Maybe<Scalars['Int']['output']>;
+  refreshIntervalMinutes?: Maybe<Scalars['Int']['output']>;
+  requiresContact: Scalars['Boolean']['output'];
+  sortOrder: Scalars['Int']['output'];
+  stripePriceId?: Maybe<Scalars['String']['output']>;
+  unlimitedMonthlyWaypoints: Scalars['Boolean']['output'];
+  updatedAt?: Maybe<Scalars['AWSDateTime']['output']>;
+  visible: Scalars['Boolean']['output'];
+};
+
+export type ProductOfferingInput = {
+  active: Scalars['Boolean']['input'];
+  billingInterval?: InputMaybe<BillingInterval>;
+  currency?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  embedLimit?: InputMaybe<Scalars['Int']['input']>;
+  entityType: SubscriptionTargetEntityType;
+  metadataJson?: InputMaybe<Scalars['String']['input']>;
+  monthlyWaypointLimit?: InputMaybe<Scalars['Int']['input']>;
+  name: Scalars['String']['input'];
+  planCode: SubscriptionPlan;
+  priceCents?: InputMaybe<Scalars['Int']['input']>;
+  refreshIntervalMinutes?: InputMaybe<Scalars['Int']['input']>;
+  requiresContact: Scalars['Boolean']['input'];
+  sortOrder: Scalars['Int']['input'];
+  stripePriceId?: InputMaybe<Scalars['String']['input']>;
+  unlimitedMonthlyWaypoints?: InputMaybe<Scalars['Boolean']['input']>;
+  visible: Scalars['Boolean']['input'];
+};
+
 export type PublicUser = {
   __typename?: 'PublicUser';
   bio?: Maybe<Scalars['String']['output']>;
@@ -631,10 +762,14 @@ export type Query = {
   getBusinessByBusinessId?: Maybe<Business>;
   getDeviceByImei?: Maybe<Device>;
   getEmbedByPublicId?: Maybe<Embed>;
+  getMyActiveSubscription?: Maybe<SubscriptionRecord>;
+  getRouteByRouteId?: Maybe<Route>;
   getRoutesByEntity?: Maybe<Array<Maybe<Route>>>;
   getStreamsByEntity?: Maybe<Array<Maybe<LiveStream>>>;
+  getSubscriptionByTarget?: Maybe<SubscriptionRecord>;
   getUserByUserId?: Maybe<User>;
   getUserByUserName?: Maybe<User>;
+  listProductOfferings: Array<ProductOffering>;
 };
 
 
@@ -653,6 +788,16 @@ export type QueryGetEmbedByPublicIdArgs = {
 };
 
 
+export type QueryGetMyActiveSubscriptionArgs = {
+  userId: Scalars['ID']['input'];
+};
+
+
+export type QueryGetRouteByRouteIdArgs = {
+  routeId: Scalars['ID']['input'];
+};
+
+
 export type QueryGetRoutesByEntityArgs = {
   entity?: InputMaybe<Scalars['String']['input']>;
 };
@@ -660,6 +805,12 @@ export type QueryGetRoutesByEntityArgs = {
 
 export type QueryGetStreamsByEntityArgs = {
   entity?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryGetSubscriptionByTargetArgs = {
+  targetEntityId: Scalars['ID']['input'];
+  targetEntityType: SubscriptionTargetEntityType;
 };
 
 
@@ -675,10 +826,41 @@ export type QueryGetUserByUserNameArgs = {
 export type RecalibrateRouteInput = {
   anchors?: InputMaybe<Array<RouteMileageAnchorInput>>;
   createdAt: Scalars['AWSDateTime']['input'];
+  exclusions?: InputMaybe<Array<RouteExclusionInput>>;
   routeId: Scalars['ID']['input'];
   targetDistanceInMiles: Scalars['Float']['input'];
   targetGainInFeet: Scalars['Int']['input'];
   userId: Scalars['ID']['input'];
+};
+
+export type RestWaypointBackfillIngestInput = {
+  points: Array<RestWaypointBackfillPointInput>;
+  /**
+   *   Optional snap mode: "forward" (default, uses currentPointIndex progression)
+   *  or "global" (snaps each point against the full route).
+   */
+  snapMode?: InputMaybe<Scalars['String']['input']>;
+  snapToRoute?: InputMaybe<Scalars['Boolean']['input']>;
+  source?: InputMaybe<Scalars['String']['input']>;
+  streamId: Scalars['ID']['input'];
+};
+
+export type RestWaypointBackfillIngestResponse = {
+  __typename?: 'RestWaypointBackfillIngestResponse';
+  failed: Scalars['Int']['output'];
+  ok: Scalars['Boolean']['output'];
+  persisted: Scalars['Int']['output'];
+  published: Scalars['Int']['output'];
+  received: Scalars['Int']['output'];
+  source?: Maybe<Scalars['String']['output']>;
+  streamId: Scalars['ID']['output'];
+};
+
+export type RestWaypointBackfillPointInput = {
+  altitude?: InputMaybe<Scalars['Float']['input']>;
+  lat: Scalars['Float']['input'];
+  lng: Scalars['Float']['input'];
+  timestamp: Scalars['AWSDateTime']['input'];
 };
 
 /**
@@ -724,6 +906,11 @@ export type Route = {
   routeId: Scalars['ID']['output'];
   storagePath: Scalars['String']['output'];
   uom: UnitOfMeasure;
+};
+
+export type RouteExclusionInput = {
+  end: LatLngInput;
+  start: LatLngInput;
 };
 
 export type RouteInput = {
@@ -801,6 +988,48 @@ export type SubscriptionOnNewWaypointArgs = {
   streamId: Scalars['ID']['input'];
 };
 
+export enum SubscriptionPlan {
+  BusinessBasic = 'BUSINESS_BASIC',
+  BusinessPlus = 'BUSINESS_PLUS',
+  CommercialRace = 'COMMERCIAL_RACE',
+  IndividualBasic = 'INDIVIDUAL_BASIC',
+  IndividualPlus = 'INDIVIDUAL_PLUS'
+}
+
+export type SubscriptionRecord = {
+  __typename?: 'SubscriptionRecord';
+  billingEmail?: Maybe<Scalars['String']['output']>;
+  businessId?: Maybe<Scalars['ID']['output']>;
+  checkoutSessionId?: Maybe<Scalars['ID']['output']>;
+  createdAt: Scalars['AWSDateTime']['output'];
+  currentPeriodEnd?: Maybe<Scalars['AWSDateTime']['output']>;
+  currentPeriodStart?: Maybe<Scalars['AWSDateTime']['output']>;
+  latestWebhookEventId?: Maybe<Scalars['String']['output']>;
+  ownerUserId: Scalars['ID']['output'];
+  planCode: SubscriptionPlan;
+  status: SubscriptionStatus;
+  stripeCustomerId?: Maybe<Scalars['String']['output']>;
+  stripeSubscriptionId?: Maybe<Scalars['String']['output']>;
+  subscriptionId: Scalars['ID']['output'];
+  targetEntityId: Scalars['ID']['output'];
+  targetEntityType: SubscriptionTargetEntityType;
+  updatedAt: Scalars['AWSDateTime']['output'];
+};
+
+export enum SubscriptionStatus {
+  Active = 'ACTIVE',
+  Canceled = 'CANCELED',
+  Free = 'FREE',
+  Incomplete = 'INCOMPLETE',
+  PastDue = 'PAST_DUE',
+  Pending = 'PENDING'
+}
+
+export enum SubscriptionTargetEntityType {
+  Business = 'BUSINESS',
+  User = 'USER'
+}
+
 export enum UnitOfMeasure {
   Imperial = 'IMPERIAL',
   Metric = 'METRIC'
@@ -819,18 +1048,28 @@ export type UpdateUserImagesInput = {
  */
 export type User = {
   __typename?: 'User';
+  billingEmail?: Maybe<Scalars['String']['output']>;
   bio?: Maybe<Scalars['String']['output']>;
   businessId?: Maybe<Scalars['ID']['output']>;
   coverImagePath?: Maybe<Scalars['String']['output']>;
+  currentPeriodEnd?: Maybe<Scalars['AWSDateTime']['output']>;
   deleted?: Maybe<Scalars['Boolean']['output']>;
   deletedAt?: Maybe<Scalars['AWSDateTime']['output']>;
   devices?: Maybe<Array<Maybe<Device>>>;
+  embedLimit?: Maybe<Scalars['Int']['output']>;
   live?: Maybe<Scalars['Boolean']['output']>;
   liveStreams?: Maybe<Array<Maybe<LiveStream>>>;
+  monthlyWaypointLimit?: Maybe<Scalars['Int']['output']>;
   posts?: Maybe<Array<Maybe<Post>>>;
   profilePicture: Scalars['String']['output'];
+  refreshIntervalMinutes?: Maybe<Scalars['Int']['output']>;
   routes?: Maybe<Array<Maybe<Route>>>;
   streamId?: Maybe<Scalars['String']['output']>;
+  stripeCustomerId?: Maybe<Scalars['String']['output']>;
+  stripeSubscriptionId?: Maybe<Scalars['String']['output']>;
+  subscriptionPlan?: Maybe<SubscriptionPlan>;
+  subscriptionStatus?: Maybe<SubscriptionStatus>;
+  unlimitedMonthlyWaypoints?: Maybe<Scalars['Boolean']['output']>;
   userId: Scalars['ID']['output'];
   username: Scalars['String']['output'];
 };

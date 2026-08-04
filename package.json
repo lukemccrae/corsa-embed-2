@@ -8,9 +8,11 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "update": "yarn build && node upload.js && sh invalidate-cash.sh",
-    "update:debug": "VITE_EMBED_DEBUG=true yarn build && node upload.js && sh invalidate-cash.sh",
-    "codegen": "npx graphql-codegen"
+    "deploy:stable": "yarn build && node upload.js && sh invalidate-cash.sh",
+    "deploy:stable:debug": "VITE_EMBED_DEBUG=true yarn build && node upload.js && sh invalidate-cash.sh",
+    "deploy:staging": "yarn build && node upload.js corsa-bundle-2.js && sh invalidate-cash.sh",
+    "deploy:staging:debug": "VITE_EMBED_DEBUG=true yarn build && node upload.js corsa-bundle-2.js && sh invalidate-cash.sh",
+    "codegen": "node -r dotenv/config ./node_modules/.bin/graphql-codegen"
   },
   "dependencies": {
     "@aws-amplify/api": "^6.3.19",

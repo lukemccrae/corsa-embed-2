@@ -17,22 +17,24 @@ scripts can interfere with it. Debugging those issues is a core workflow here.
 
 - `yarn dev` — Vite dev server
 - `yarn build` — typecheck + build to `dist-singlefile/bundle.js`
-- `yarn update` — build + upload to S3 + invalidate CloudFront (PRODUCTION, quiet)
-- `yarn update:debug` — same, but builds with `VITE_EMBED_DEBUG=true`
+- `yarn deploy:stable` — build + upload to S3 as `corsa-bundle.js` + invalidate CloudFront (PRODUCTION, quiet)
+- `yarn deploy:stable:debug` — same, but builds with `VITE_EMBED_DEBUG=true`
+- `yarn deploy:staging` — build + upload to S3 as `corsa-bundle-2.js` (staging URL, no user impact)
+- `yarn deploy:staging:debug` — same, but builds with `VITE_EMBED_DEBUG=true`
 - `yarn lint` — ESLint (note: `eslint.config.js` is currently broken; see below)
 - `yarn codegen` — regenerate `src/generated/schema.ts`
 
 ## The debug/deploy loop (IMPORTANT)
 
 There is a single bundle URL. A debug build and a production build are the SAME
-URL, so deploying a debug build overwrites production and `yarn update`
+URL, so deploying a debug build overwrites production and `yarn deploy:stable`
 switches it back off. This is intentional and is the documented workflow:
 
-1. Host reports a problem → run `yarn update:debug`.
+1. Host reports a problem → run `yarn deploy:stable:debug`.
 2. Have the host open DevTools console; the embed logs diagnostics and prints a
    copyable JSON blob (auto-copied to clipboard when permitted).
 3. The host pastes the JSON into the thread. Agent reads it and diagnoses.
-4. Fix → run `yarn update` to redeploy the quiet production bundle.
+4. Fix → run `yarn deploy:stable` to redeploy the quiet production bundle.
 
 Per-page knobs (only meaningful in a debug build):
 - `window.__CORSA_EMBED_CONFIG__.debug = false` — disable logging on a page.
