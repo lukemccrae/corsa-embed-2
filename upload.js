@@ -12,8 +12,9 @@ const bucketName = "corsa-general-bucket";
 const fileKey = process.argv[2] ?? "corsa-bundle.js";
 const localFilePath = "./dist-singlefile/bundle.js"; // Local file to upload
 
-// Initialize S3 client
-const s3 = new S3Client({ region: "us-west-1" }); // Change region as needed
+// Initialize S3 client. Credentials come from the AWS profile named by
+// AWS_PROFILE (defaults to "prod" since the account moved off "default").
+const s3 = new S3Client({ region: "us-west-1", profile: process.env.AWS_PROFILE ?? "prod" }); // Change region as needed
 
 async function replaceFile() {
   try {

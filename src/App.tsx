@@ -2,17 +2,20 @@ import { PrimeReactProvider } from "primereact/api";
 import { UserProvider } from "./context/UserContext";
 import { StreamPage } from "./components/StreamPage";
 import { RoutePage } from "./components/RoutePage";
+import { PublicEmbedPage } from "./components/PublicEmbedPage";
 import ThemeProvider from "./components/ThemeProvider";
 import "./embed.css";
 
 interface AppProps {
-  username: string;
+  username?: string;
   /** streamId for stream embed mode */
   streamId?: string;
   /** routeId for route embed mode */
   routeId?: string;
   /** "stream" (default) | "route" */
   view?: "stream" | "route";
+  /** Public id for embed settings retrieval (data-corsa-public-id) */
+  publicId?: string;
   /** Maximum height (px) for the feed/posts scroll area. Default: 600 */
   feedMaxHeight?: number;
   /** Maximum height (px) for the chat scroll area. Default: 420 */
@@ -33,6 +36,7 @@ export default function App({
   streamId,
   routeId,
   view,
+  publicId,
   feedMaxHeight,
   chatMaxHeight,
   components,
@@ -45,13 +49,15 @@ export default function App({
       <ThemeProvider>
         <UserProvider>
           <div className="w-full max-w-3xl mx-auto">
-            {resolvedView === "route" && routeId ? (
+            {publicId ? (
+              <PublicEmbedPage publicId={publicId} />
+            ) : username && resolvedView === "route" && routeId ? (
               <RoutePage
                 username={username}
                 routeId={routeId}
                 components={components}
               />
-            ) : streamId ? (
+            ) : username && streamId ? (
               <StreamPage
                 username={username}
                 streamId={streamId}

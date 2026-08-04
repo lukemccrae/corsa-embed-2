@@ -155,6 +155,42 @@ export const STREAM_CHAT_PAGE_QUERY = (
 `;
 
 /**
+ * Fetches an embed (and its settings + live stream) by its public id.
+ * Used when the host page only provides a `data-corsa-public-id` attribute.
+ */
+export const EMBED_SETTINGS_QUERY = /* GraphQL */ `
+  query GetEmbedByPublicId($publicId: ID!) {
+    getEmbedByPublicId(publicId: $publicId) {
+      embedId
+      publicId
+      name
+      enabled
+      settings {
+        feedMaxHeight
+        showChat
+        showElevation
+        showHeader
+        showMap
+        showPosts
+        showProfile
+        showRoute
+        showSponsors
+        theme
+      }
+      livestream {
+        streamId
+        title
+        live
+        publicUser {
+          username
+          profilePicture
+        }
+      }
+    }
+  }
+`;
+
+/**
  * Fetches route metadata for a given user, used by the route embed.
  * Pass the routeId to filter the desired route on the client side.
  */

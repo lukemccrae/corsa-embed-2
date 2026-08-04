@@ -23,6 +23,12 @@ import {
  *     data-stream-id="abc123"
  *   ></script>
  *
+ * Public-id embed example (settings retrieved via getEmbedByPublicId):
+ *   <script
+ *     src="https://your-cdn/bundle.js"
+ *     data-corsa-public-id="913d3f0e-caae-4ea1-8a1a-0d1c20b0b3da"
+ *   ></script>
+ *
  * Route embed example:
  *   <script
  *     src="https://your-cdn/bundle.js"
@@ -39,7 +45,7 @@ function mount() {
     (document.currentScript as HTMLScriptElement | null) ??
     [
       ...document.querySelectorAll<HTMLScriptElement>(
-        "script[data-username]"
+        "script[data-username], script[data-corsa-public-id]"
       ),
     ].at(-1);
 
@@ -58,6 +64,7 @@ function mount() {
   const username = scriptEl.dataset.username;
   const streamId = scriptEl.dataset.streamId;
   const routeId = scriptEl.dataset.routeId;
+  const publicId = scriptEl.dataset.corsaPublicId;
   const view = scriptEl.dataset.view as "stream" | "route" | undefined;
   const mountSelector = scriptEl.dataset.mount;
 
@@ -86,14 +93,14 @@ function mount() {
   // Extract component visibility settings
   const components = runtimeConfig?.components ?? {};
 
-  if (!username) {
+  if (!username && !publicId) {
     console.error(
       "[CorsaEmbed] Missing data-username attribute on the <script> tag."
     );
     return;
   }
 
-  if (!streamId && !routeId) {
+  if (!publicId && !streamId && !routeId) {
     console.error(
       "[CorsaEmbed] Missing data-stream-id or data-route-id on the <script> tag."
     );
@@ -113,7 +120,7 @@ function mount() {
     }
   } else {
     container = document.createElement("div");
-    container.id = `corsa-embed-${streamId ?? routeId}`;
+    container.id = `corsa-embed-${streamId ?? routeId ?? publicId ?? "public"}`;
     container.className = "corsa-embed-container";
     container.style.width = "100%";
     container.style.boxSizing = "border-box";
@@ -127,6 +134,7 @@ function mount() {
         streamId={streamId}
         routeId={routeId}
         view={view}
+        publicId={publicId}
         feedMaxHeight={feedMaxHeight}
         chatMaxHeight={chatMaxHeight}
         components={components}
@@ -149,6 +157,7 @@ interface MountOptions {
   username: string;
   streamId?: string;
   routeId?: string;
+  publicId?: string;
   view?: "stream" | "route";
   feedMaxHeight?: number;
   chatMaxHeight?: number;
@@ -179,6 +188,7 @@ function mountTo(options: MountOptions) {
         streamId={options.streamId}
         routeId={options.routeId}
         view={options.view}
+        publicId={options.publicId}
         feedMaxHeight={options.feedMaxHeight}
         chatMaxHeight={options.chatMaxHeight}
         components={options.components}
