@@ -113,7 +113,7 @@ export function StreamPage({
           {},
           token,
         );
-        
+
         const userData = data.getUserByUserName;
         // console.log(userData, "fetched stream profile data");
         setUser(userData);
@@ -280,7 +280,7 @@ export function StreamPage({
   });
 
   const posts: Post[] =
-    stream.posts?.filter((p): p is Post => p != null).sort((a, b) => 
+    stream.posts?.filter((p): p is Post => p != null).sort((a, b) =>
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     ) ?? [];
 
@@ -292,11 +292,11 @@ export function StreamPage({
   // Debug logging (compiled out in production builds)
   if (DEBUG_BUILD) {
     ceDebug('[StreamPage] Debug:', {
-    postsCount: posts.length,
-    postsWithLocation: posts.filter((p) => p.location?.lat != null && p.location?.lng != null).length,
-    hasPostsWithLocation,
-    publicWaypointsCount: publicWaypoints.length,
-    hasMap,
+      postsCount: posts.length,
+      postsWithLocation: posts.filter((p) => p.location?.lat != null && p.location?.lng != null).length,
+      hasPostsWithLocation,
+      publicWaypointsCount: publicWaypoints.length,
+      hasMap,
     });
   }
 
@@ -330,8 +330,7 @@ export function StreamPage({
       {/* Notification if all waypoints are hidden */}
       {allWaypointsHidden && (
         <div className="p-4 mb-4 bg-yellow-100 text-yellow-800 rounded text-center text-sm border border-yellow-300">
-          Location points are currently hidden due to privacy settings.
-        </div>
+          Waiting for location data from this stream...        </div>
       )}
 
       {/* When there is no map to render (private/no waypoints), keep Corsa branding visible */}
